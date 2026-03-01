@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px;">
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <span class="badge-new">Get in Touch</span>
+        <h1 style="font-size: 3.5rem; margin-top: 1rem;">We're Here to Help</h1>
+        <p style="font-size: 1.25rem; color: var(--text-muted);">Have questions about buying or selling? Our team is
+            just an email away.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;">
+        <div
+            style="background: white; padding: 3rem; border-radius: 40px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+            <form action="{{ url_for('contact') }}" method="POST">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="font-weight: 600;">Full Name</label>
+                    <input type="text" name="name" required placeholder="Mohit Ahire">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="font-weight: 600;">College Email</label>
+                    <input type="email" name="email" required placeholder="mohit@college.edu">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="font-weight: 600;">Issue Type</label>
+                    <select name="type">
+                        <option value="Buying Support">Buying Support</option>
+                        <option value="Selling Support">Selling Support</option>
+                        <option value="Account Issue">Account Issue</option>
+                        <option value="General Feedback">General Feedback</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label style="font-weight: 600;">Your Message</label>
+                    <textarea name="message" rows="5" required placeholder="How can we help you today?"></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Send Message</button>
+            </form>
+        </div>
+
+        <div style="padding: 2rem;">
+            <div style="margin-bottom: 3rem;">
+                <div
+                    style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 1.5rem; font-size: 1.5rem;">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">Email Support</h3>
+                <p style="color: var(--text-muted);">For account support and inquiries:</p>
+                <a href="mailto:campuskart@gmail.com"
+                    style="color: var(--primary); font-weight: 700; text-decoration: none;">campuskart@gmail.com</a>
+            </div>
+
+            <div style="margin-bottom: 3rem;">
+                <div
+                    style="width: 50px; height: 50px; background: #25d366; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 1.5rem; font-size: 1.5rem;">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">WhatsApp Support</h3>
+                <p style="color: var(--text-muted);">Quick chat for urgent issues:</p>
+                <a href="https://wa.me/917758876827"
+                    style="color: #25d366; font-weight: 700; text-decoration: none;">+91 77588 76827</a>
+            </div>
+
+            <div>
+                <div
+                    style="width: 50px; height: 50px; background: #ea4335; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 1.5rem; font-size: 1.5rem;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main);">Nashik Office</h3>
+                <p style="color: var(--text-muted); line-height: 1.6;">College Road, Nashik,<br> Maharashtra 422005</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

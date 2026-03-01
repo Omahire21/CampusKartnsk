@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px;">
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <span class="badge-new">Our Story</span>
+        <h1 style="font-size: 3.5rem; margin-top: 1rem;">Students Empowering Students</h1>
+        <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin: 0 auto;">
+            CampusKart was born out of a simple need: making campus life more affordable and sustainable for everyone in
+            Nashik.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 6rem;">
+        <div>
+            <h2 style="font-size: 2rem; margin-bottom: 1.5rem;">Why CampusKart?</h2>
+            <p style="line-height: 1.8; color: var(--text-muted); margin-bottom: 1.5rem;">
+                Every semester, students spend thousands on textbooks, electronics, and dorm essentials that they only
+                need for a few months. Meanwhile, seniors have perfectly good items gathering dust.
+            </p>
+            <p style="line-height: 1.8; color: var(--text-muted);">
+                We created a secure, verified marketplace exclusively for student communities in Nashik to trade easily,
+                save money, and reduce waste.
+            </p>
+        </div>
+        <div
+            style="background: var(--glass); padding: 3rem; border-radius: 40px; border: 1px solid var(--glass-border);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div style="text-align: center;">
+                    <h3 style="font-size: 2.5rem; color: var(--primary);">2k+</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Active Students</p>
+                </div>
+                <div style="text-align: center;">
+                    <h3 style="font-size: 2.5rem; color: var(--primary);">500+</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Items Sold</p>
+                </div>
+                <div style="text-align: center;">
+                    <h3 style="font-size: 2.5rem; color: var(--primary);">10+</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Colleges</p>
+                </div>
+                <div style="text-align: center;">
+                    <h3 style="font-size: 2.5rem; color: var(--primary);">₹1L+</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Money Saved</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 4rem; background: var(--primary); border-radius: 40px; color: white;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Ready to Join Nashik's Student Hub?</h2>
+        <p style="margin-bottom: 2rem; opacity: 0.9;">Start buying or selling within your campus community today.</p>
+        <a href="{{ url_for('register') }}" class="btn-primary"
+            style="background: white; color: var(--primary) !important;">Get Started Now</a>
+    </div>
+</div>
+{% endblock %}

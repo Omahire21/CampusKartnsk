@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ url_for('product_detail', product_id=product_id) }}"
+        style="color: var(--text-muted); display: inline-block; margin-bottom: 2rem;">
+        <i class="fas fa-arrow-left"></i> Back to Product
+    </a>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>Chatting with {{ receiver.username }}</h3>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            {% if messages %}
+            {% for msg in messages %}
+            <div class="message {% if msg.sender_id == session['user_id'] %}sent{% else %}received{% endif %}">
+                <p>{{ msg.message }}</p>
+                <span style="font-size: 0.6rem; opacity: 0.7; display: block; margin-top: 0.3rem;">
+                    {{ msg.timestamp.strftime('%H:%M') }}
+                </span>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                No messages yet. Say hello!
+            </div>
+            {% endif %}
+        </div>
+
+        <form class="chat-input" action="{{ url_for('chat', product_id=product_id, receiver_id=receiver_id) }}"
+            method="POST">
+            <input type="text" name="message" placeholder="Type a message..." required autocomplete="off">
+            <button type="submit" class="btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Scroll to bottom
+    const chatBox = document.getElementById('chatMessages');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock %}

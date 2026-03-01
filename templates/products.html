@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1>Explore Items</h1>
+            <p style="color: var(--text-muted);">Showing products from <strong>{{ current_college if current_college
+                    else 'All Colleges' }}</strong></p>
+        </div>
+
+        <form action="{{ url_for('products') }}" method="GET" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="form-group" style="margin: 0; min-width: 200px;">
+                <input type="text" name="search" placeholder="Search products..."
+                    value="{{ request.args.get('search', '') }}">
+            </div>
+            <div class="form-group" style="margin: 0;">
+                <select name="category" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    <option value="Books" {% if request.args.get('category')=='Books' %}selected{% endif %}>Books
+                    </option>
+                    <option value="Electronics" {% if request.args.get('category')=='Electronics' %}selected{% endif %}>
+                        Electronics</option>
+                    <option value="Calculators" {% if request.args.get('category')=='Calculators' %}selected{% endif %}>
+                        Calculators</option>
+                    <option value="Shoes" {% if request.args.get('category')=='Shoes' %}selected{% endif %}>Shoes
+                    </option>
+                    <option value="Dorm Essentials" {% if request.args.get('category')=='Dorm Essentials' %}selected{%
+                        endif %}>Dorm Essentials</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin: 0;">
+                <select name="college" onchange="this.form.submit()">
+                    <option value="">All Colleges</option>
+                    {% for college in colleges %}
+                    <option value="{{ college }}" {% if current_college==college %}selected{% endif %}>{{ college }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Filter</button>
+            <a href="{{ url_for('products') }}" class="btn-primary"
+                style="background: white; color: var(--text-main); border: 1px solid var(--border); box-shadow: none;">Clear</a>
+        </form>
+    </div>
+
+    {% if products %}
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <div style="position: relative;">
+                <img src="{{ product.image_url if (product.image_url and (product.image_url.startswith('http') or product.image_url.startswith('https'))) else url_for('uploaded_file', filename=product.image_url) if product.image_url else 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                    alt="{{ product.name }}" class="product-image" style="filter: contrast(0.9) brightness(0.95);">
+                <span
+                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; backdrop-filter: blur(5px);">PRE-OWNED</span>
+            </div>
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="product-price">₹{{ product.price }}</p>
+                <div class="product-meta">
+                    <span><i class="fas fa-university"></i> {{ product.college }}</span>
+                    <span><i class="fas fa-tag"></i> {{ product.category }}</span>
+                </div>
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn-view">Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 5rem; background: var(--glass); border-radius: 20px;">
+        <i class="fas fa-search" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+        <h3>No products found</h3>
+        <p style="color: var(--text-muted);">Try adjusting your search or filters.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

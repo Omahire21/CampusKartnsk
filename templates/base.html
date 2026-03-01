@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusKart – College Marketplace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+</head>
+
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}" class="logo">CAMPUSKART</a>
+        <div class="nav-links">
+            {% if session.get('user_id') %}
+            {% if session.get('is_admin') %}
+            <a href="{{ url_for('admin') }}">Admin Panel</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('products') }}">Shop</a>
+            <a href="{{ url_for('add_product') }}">Sell Item</a>
+            <a href="{{ url_for('logout') }}">Logout ({{ session.get('username') }})</a>
+            {% endif %}
+            {% else %}
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('products') }}">Shop</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}" class="btn-primary" style="color: white !important;">Sign Up</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <main style="flex: 1;">
+        {% if request.path != '/' %}
+        <div class="container" style="padding-top: 2rem; padding-bottom: 0;">
+            <button onclick="history.back()" class="btn-back-premium">
+                <div class="btn-back-inner">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Go Back</span>
+                </div>
+            </button>
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <!-- Brand & Info -->
+            <div class="footer-col brand-col">
+                <a href="{{ url_for('index') }}" class="logo"
+                    style="font-size: 1.8rem; display: block; margin-bottom: 1.5rem; color: var(--primary);">CAMPUSKART</a>
+                <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">The smartest way for
+                    students in Nashik to buy, sell, and trade essentials with verified peers. Simple. Secure. Local.
+                </p>
+                <div class="footer-social">
+                    <a href="javascript:void(0)" onclick="toastMsg()" class="facebook"><img
+                            src="{{ url_for('static', filename='images/icons/facebook.png') }}" alt="Facebook"></a>
+                    <a href="javascript:void(0)" onclick="toastMsg()" class="instagram"><img
+                            src="{{ url_for('static', filename='images/icons/instagram.png') }}" alt="Instagram"></a>
+                    <a href="javascript:void(0)" onclick="toastMsg()" class="twitter"><img
+                            src="{{ url_for('static', filename='images/icons/twitter.png') }}" alt="Twitter"></a>
+                    <a href="javascript:void(0)" onclick="toastMsg()" class="linkedin"><img
+                            src="{{ url_for('static', filename='images/icons/linkedin.png') }}" alt="LinkedIn"></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('products') }}">Browse Shop</a></li>
+                    <li><a href="{{ url_for('add_product') }}">Sell on Item</a></li>
+                    <li><a href="{{ url_for('about') }}">Our Story</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Categories -->
+            <div class="footer-col">
+                <h3>Categories</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('products', category='Books') }}">Textbooks</a></li>
+                    <li><a href="{{ url_for('products', category='Electronics') }}">Electronics</a></li>
+                    <li><a href="{{ url_for('products', category='Calculators') }}">Calculators</a></li>
+                    <li><a href="{{ url_for('products', category='Shoes') }}">Footwear</a></li>
+                    <li><a href="{{ url_for('products', category='Dorm Essentials') }}">Dorm Life</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="footer-col">
+                <h3>Get in Touch</h3>
+                <ul class="footer-contact">
+                    <li><i class="fas fa-map-marker-alt"></i> Nashik, Maharashtra</li>
+                    <li><i class="fas fa-envelope"></i> campuskart@gmail.com</li>
+                    <li><i class="fas fa-phone"></i> +91 77588 76827</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-container"
+                style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 3rem;">
+                <p style="color: var(--text-muted); font-size: 0.85rem;">&copy; 2026 CampusKart Nashik. All Rights
+                    Reserved.</p>
+                <div style="display: flex; gap: 2rem;">
+                    <a href="{{ url_for('privacy') }}"
+                        style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}"
+                        style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">Terms of
+                        Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Social Coming Soon Script -->
+    <script>
+        function toastMsg() {
+            // Create a temporary stylish notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 50px;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                font-family: 'Outfit', sans-serif;
+                pointer-events: none;
+                animation: popUp 0.4s ease forwards, fadeAway 0.4s ease 2.5s forwards;
+            `;
+            toast.innerText = "Social Media handles are coming soon! 🚀";
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+
+    <style>
+        @keyframes popUp {
+            from {
+                opacity: 0;
+                bottom: 0;
+            }
+
+            to {
+                opacity: 1;
+                bottom: 30px;
+            }
+        }
+
+        @keyframes fadeAway {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.9);
+            }
+        }
+    </style>
+
+    <script>
+        // Auto-hide flashes
+        setTimeout(() => {
+            document.querySelectorAll('.flash').forEach(f => f.style.display = 'none');
+        }, 5000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <h1 style="margin-bottom: 2rem;">Sell an Item</h1>
+    <div class="auth-container" style="max-width: 100%; margin: 0;">
+        <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" name="name" required placeholder="e.g. TI-84 Plus CE">
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" step="10" name="price" required placeholder="0">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="Books">Books</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Calculators">Calculators</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Dorm Essentials">Dorm Essentials</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Product Usage / Condition</label>
+                    <select name="usage_info" required>
+                        <option value="Brand New">Brand New</option>
+                        <option value="Like New (Used for < 1 month)">Like New (Used for &lt; 1 month)</option>
+                        <option value="Good (Used for 1-6 months)">Good (Used for 1-6 months)</option>
+                        <option value="Fair (Used for > 6 months)">Fair (Used for &gt; 6 months)</option>
+                        <option value="Well Used">Well Used</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="5" required
+                    placeholder="Tell buyers more about your item..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Product Image</label>
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; margin-top: 2rem;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 1rem; font-size: 1.1rem;">List
+                    Item</button>
+                <a href="{{ url_for('products') }}" class="btn-secondary"
+                    style="flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; text-decoration: none;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

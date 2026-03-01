@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="hero-slideshow">
+    <div class="slides">
+        <!-- Slide 1 -->
+        <div class="slide slide-1 active">
+            <div class="hero-content">
+                <span class="badge-new">#1 College Marketplace</span>
+                <h1>Buy, Sell & Trade <br> on Your Campus</h1>
+                <p>The smartest way for students to save money and find essentials from books to electronics. Exclusive
+                    for verified students.</p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('products') }}" class="btn-primary">Shop Now</a>
+                    <a href="{{ url_for('register') }}" class="btn-secondary">Get Started</a>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="slide slide-2">
+            <div class="hero-content">
+                <span class="badge-new">Save Big</span>
+                <h1>Books, Gadgets <br> & Student Life</h1>
+                <p>Don't pay retail prices. Get used textbooks and electronics from your seniors at half the price.</p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('products') }}" class="btn-primary">Browse Books</a>
+                    <a href="{{ url_for('add_product') }}" class="btn-secondary">Sell Yours</a>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="slide slide-3">
+            <div class="hero-content">
+                <span class="badge-new">Verified Users</span>
+                <h1>Nashik's Premier <br> Student Network</h1>
+                <p>Join thousands of students from KTHM, PVG, Sandip, and more Nashik colleges in a safe marketplace.
+                </p>
+                <div class="hero-actions">
+                    <a href="{{ url_for('register') }}" class="btn-primary">Join Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slideshow Indicators -->
+    <div class="slideshow-indicators">
+        <span class="dot active" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
+    </div>
+</header>
+
+<div class="container">
+    <h2 style="margin-bottom: 2rem;">Recently Added</h2>
+    <div class="product-grid recent-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <img src="{{ product.image_url if (product.image_url and (product.image_url.startswith('http') or product.image_url.startswith('https'))) else url_for('uploaded_file', filename=product.image_url) if product.image_url else 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                alt="{{ product.name }}" class="product-image">
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="product-price">₹{{ product.price }}</p>
+                <div class="product-meta">
+                    <span><i class="fas fa-university"></i> {{ product.college }}</span>
+                    <span><i class="fas fa-tag"></i> {{ product.category }}</span>
+                </div>
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn-view">Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    let slideIndex = 1;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    let slideTimer;
+
+    function showSlides(n) {
+        if (n > slides.length) { slideIndex = 1 }
+        if (n < 1) { slideIndex = slides.length }
+
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+
+        slides[slideIndex - 1].classList.add('active');
+        dots[slideIndex - 1].classList.add('active');
+    }
+
+    function autoSlides() {
+        slideIndex++;
+        showSlides(slideIndex);
+        slideTimer = setTimeout(autoSlides, 5000);
+    }
+
+    function currentSlide(n) {
+        clearTimeout(slideTimer);
+        slideIndex = n;
+        showSlides(slideIndex);
+        slideTimer = setTimeout(autoSlides, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showSlides(slideIndex);
+        slideTimer = setTimeout(autoSlides, 5000);
+    });
+</script>
+{% endblock %}

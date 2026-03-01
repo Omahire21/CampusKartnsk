@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Join the Community</h2>
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="username" required placeholder="Mohit Ahire">
+            </div>
+            <div class="form-group">
+                <label>Email Address (College or Personal)</label>
+                <input type="email" name="email" required placeholder="mohit@college.edu or personal@gmail.com">
+            </div>
+            <div class="form-group" style="position: relative;">
+                <label>College Name (Nashik)</label>
+                <input type="text" id="collegeSearch" placeholder="Type to search your college..." autocomplete="off"
+                    style="width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border); background: #f8fafc;">
+                <input type="hidden" name="college" id="collegeValue" required>
+
+                <div id="collegeDropdown" class="custom-dropdown"
+                    style="display: none; position: absolute; width: 100%; max-height: 250px; overflow-y: auto; background: white; border: 1px solid var(--border); border-radius: 10px; z-index: 1000; box-shadow: var(--shadow-md); margin-top: 5px;">
+                    {% for col in colleges %}
+                    <div class="dropdown-item"
+                        style="padding: 0.8rem; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;"
+                        data-value="{{ col }}">
+                        {{ col }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <script>
+                const searchInput = document.getElementById('collegeSearch');
+                const dropdown = document.getElementById('collegeDropdown');
+                const hiddenInput = document.getElementById('collegeValue');
+                const items = dropdown.getElementsByClassName('dropdown-item');
+
+                searchInput.addEventListener('focus', () => {
+                    dropdown.style.display = 'block';
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+
+                searchInput.addEventListener('input', () => {
+                    const filter = searchInput.value.toLowerCase();
+                    let hasResults = false;
+                    for (let i = 0; i < items.length; i++) {
+                        const text = items[i].innerText.toLowerCase();
+                        if (text.includes(filter)) {
+                            items[i].style.display = 'block';
+                            hasResults = true;
+                        } else {
+                            items[i].style.display = 'none';
+                        }
+                    }
+                    dropdown.style.display = hasResults ? 'block' : 'none';
+                });
+
+                for (let i = 0; i < items.length; i++) {
+                    items[i].addEventListener('click', function () {
+                        const val = this.getAttribute('data-value');
+                        searchInput.value = val;
+                        hiddenInput.value = val;
+                        dropdown.style.display = 'none';
+                    });
+                }
+            </script>
+
+            <style>
+                .dropdown-item:hover {
+                    background: #f1f5f9;
+                    color: var(--primary);
+                }
+            </style>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
+        </form>
+        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+            Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary);">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
