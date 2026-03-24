@@ -15,13 +15,27 @@
         <div class="nav-links">
             {% if session.get('user_id') %}
             {% if session.get('is_admin') %}
-            <a href="{{ url_for('admin') }}">Admin Panel</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('admin') }}"><i class="fas fa-shield-halved"></i> Admin Panel</a>
+            <a href="{{ url_for('logout') }}" class="nav-btn-logout"><i class="fas fa-right-from-bracket"></i>
+                Logout</a>
             {% else %}
-            <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('products') }}">Shop</a>
-            <a href="{{ url_for('add_product') }}">Sell Item</a>
-            <a href="{{ url_for('logout') }}">Logout ({{ session.get('username') }})</a>
+            <a href="{{ url_for('index') }}" class="nav-icon-link" title="Home"><i class="fas fa-home"></i> Home</a>
+            <a href="{{ url_for('products') }}" class="nav-icon-link" title="Browse Products"><i
+                    class="fas fa-store"></i> Products</a>
+            <a href="{{ url_for('my_chats') }}" class="nav-icon-link" title="My Chats"><i
+                    class="fas fa-comment-dots"></i> My Chats</a>
+            <a href="{{ url_for('favorites') }}" class="nav-icon-link" title="Favorites"><i class="fas fa-heart"></i>
+                Favorites</a>
+            <a href="{{ url_for('my_items') }}" class="nav-icon-link" title="My Items"><i
+                    class="fas fa-boxes-stacked"></i> My Items</a>
+            <a href="{{ url_for('leaderboard') }}" class="nav-icon-link" title="Leaderboard"><i
+                    class="fas fa-ranking-star"></i> Leaderboard</a>
+            <a href="{{ url_for('profile') }}"
+                class="nav-icon-link {% if request.path.startswith('/profile') %}nav-active{% endif %}"
+                title="Profile"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="{{ url_for('add_product') }}" class="nav-btn-sell"><i class="fas fa-plus"></i> Sell Item</a>
+            <a href="{{ url_for('logout') }}" class="nav-btn-logout" title="Logout"><i
+                    class="fas fa-right-from-bracket"></i> Logout</a>
             {% endif %}
             {% else %}
             <a href="{{ url_for('index') }}">Home</a>
@@ -31,6 +45,7 @@
             {% endif %}
         </div>
     </nav>
+
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -42,17 +57,16 @@
         {% endwith %}
     </div>
 
+    <!-- KYC Verification Banner -->
+    {% if session.get('user_id') and not session.get('is_admin') and session.get('kyc_status') != 'approved' %}
+    <div class="kyc-banner">
+        <i class="fas fa-triangle-exclamation"></i>
+        <span>Action Required: Please verify your student identity to unlock buying/selling features.</span>
+        <a href="{{ url_for('kyc') }}" class="kyc-banner-btn">Verify Now</a>
+    </div>
+    {% endif %}
+
     <main style="flex: 1;">
-        {% if request.path != '/' %}
-        <div class="container" style="padding-top: 2rem; padding-bottom: 0;">
-            <button onclick="history.back()" class="btn-back-premium">
-                <div class="btn-back-inner">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Go Back</span>
-                </div>
-            </button>
-        </div>
-        {% endif %}
         {% block content %}{% endblock %}
     </main>
 
@@ -157,6 +171,41 @@
     </script>
 
     <style>
+        .kyc-banner {
+            background: #fffbeb;
+            border-bottom: 1px solid #fde68a;
+            padding: 0.65rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.88rem;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        .kyc-banner i {
+            color: #f59e0b;
+        }
+
+        .kyc-banner span {
+            flex: 1;
+        }
+
+        .kyc-banner-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.35rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+
+        .kyc-banner-btn:hover {
+            opacity: 0.9;
+        }
+
         @keyframes popUp {
             from {
                 opacity: 0;
@@ -187,6 +236,59 @@
         setTimeout(() => {
             document.querySelectorAll('.flash').forEach(f => f.style.display = 'none');
         }, 5000);
+
+        // Global AJAX Favorite Toggle
+        function handleFavorite(event, productId) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const button = form.querySelector('button');
+            const svg = button.querySelector('svg');
+
+            // Visual feedback - scale animation
+            button.style.transform = 'scale(1.3)';
+            setTimeout(() => button.style.transform = '', 200);
+
+            fetch(`/favorites/toggle/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = "{{ url_for('login') }}";
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.status === 'success') {
+                        if (data.action === 'added') {
+                            svg.setAttribute('fill', '#ef4444');
+                            // Optional: Small pop animation or toast
+                        } else {
+                            svg.setAttribute('fill', 'none');
+                            // If we are on the favorites page, we should probably remove the card or refresh
+                            if (window.location.pathname === "{{ url_for('favorites') }}") {
+                                const card = form.closest('div[style*="background: white"]');
+                                if (card) {
+                                    card.style.opacity = '0';
+                                    card.style.transform = 'translateX(20px)';
+                                    setTimeout(() => {
+                                        card.remove();
+                                        // Check if list is empty
+                                        const container = document.querySelector('.container div[style*="flex-direction: column"]');
+                                        if (container && container.children.length === 0) {
+                                            window.location.reload(); // Show empty state
+                                        }
+                                    }, 300);
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(err => console.error('Error toggling favorite:', err));
+        }
     </script>
 </body>
 

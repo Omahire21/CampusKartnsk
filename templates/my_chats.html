@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="max-width: 860px; margin: 2rem auto 4rem;">
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.8rem; font-weight: 800; margin: 0;">My Chats</h1>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0.3rem 0 0;">Your ongoing conversations</p>
+    </div>
+
+    {% if conversations %}
+    <div
+        style="background: white; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm);">
+        {% for c in conversations %}
+        <a href="{{ url_for('chat', product_id=c.product_id, receiver_id=c.other_user_id) }}"
+            style="display: flex; align-items: center; gap: 1.2rem; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s;">
+            <div
+                style="width: 46px; height: 46px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0;">
+                {{ c.other_username[0]|upper }}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-weight: 700; font-size: 0.93rem; color: var(--text-main);">{{ c.other_username }}</div>
+                <div
+                    style="font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    Re: {{ c.product_name }}
+                </div>
+                <div
+                    style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ c.last_message }}</div>
+            </div>
+            <div style="text-align: right; flex-shrink: 0; font-size: 0.75rem; color: #94a3b8;">
+                {{ c.last_time.strftime('%d %b') if c.last_time else '' }}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div
+        style="background: white; border: 1px solid var(--border); border-radius: 20px; padding: 5rem 2rem; text-align: center; box-shadow: var(--shadow-sm);">
+        <i class="fas fa-comments" style="font-size: 3rem; color: #cbd5e1; display: block; margin-bottom: 1rem;"></i>
+        <h3 style="color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">No conversations yet</h3>
+        <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 1.5rem;">Start chatting with sellers by visiting a
+            product</p>
+        <a href="{{ url_for('products') }}" class="btn-primary" style="display: inline-block;">Browse Products</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

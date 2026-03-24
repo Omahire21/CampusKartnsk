@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
-    product_id INT NOT NULL,
+    product_id INT,
     message TEXT NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -39,3 +39,13 @@ CREATE TABLE IF NOT EXISTS messages (
 
 -- Insert a default admin user (password will be 'admin123' hashed later)
 -- For demonstration, you might need to run the Flask app to create the first admin correctly.
+
+CREATE TABLE IF NOT EXISTS favorites (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_fav (user_id, product_id)
+);

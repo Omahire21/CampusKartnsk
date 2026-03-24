@@ -1,0 +1,496 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 960px; margin: 2rem auto 4rem;">
+
+    <div id="mainProfileHeader" style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <a href="{{ url_for('index') }}"
+            style="color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1.5px solid #000; padding: 0.5rem 1.2rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; background: white;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Edit Mode Header (Hidden by default) -->
+    <div id="editHeader"
+        style="display: none; align-items: center; justify-content: flex-end; margin-bottom: 2rem; background: transparent;">
+        <div style="display: flex; gap: 0.8rem;">
+            <button onclick="cancelEdit()" class="btn-outline-sm"
+                style="background: white; border-color: var(--border); color: var(--text-muted);">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="submit" form="profileUpdateForm" id="headerSaveBtn" class="btn-primary"
+                style="padding: 0.4rem 1rem; font-size: 0.85rem; display: none;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header-card" id="profileHeaderCard">
+        <div class="profile-avatar" style="overflow: hidden; position: relative; padding: 0;">
+            <label for="profileImageUpdate"
+                style="cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">
+                {% if session.get('profile_pic') %}
+                <img src="{{ url_for('uploaded_file', filename=session.get('profile_pic')) }}"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <span>{{ user.username[0]|upper }}</span>
+                {% endif %}
+                <div
+                    style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); padding: 4px 0; text-align: center; color: white;">
+                    <i class="fas fa-camera" style="font-size: 0.9rem;"></i>
+                </div>
+            </label>
+            <form id="avatarForm" action="{{ url_for('update_profile_photo') }}" method="POST"
+                enctype="multipart/form-data" style="display:none;">
+                <input type="file" id="profileImageUpdate" name="profile_pic" accept="image/*"
+                    onchange="document.getElementById('avatarForm').submit()">
+            </form>
+        </div>
+        <div style="flex: 1;">
+            <h1 style="font-size: 1.7rem; margin: 0 0 0.2rem; color: var(--text-main);">{{ user.username }}</h1>
+            <p style="color: var(--text-muted); margin: 0 0 0.5rem; font-size: 0.9rem;">
+                <i class="fas fa-envelope" style="color: var(--primary); margin-right: 0.3rem;"></i>{{ user.email }}
+            </p>
+            <p style="margin: 0; font-size: 0.82rem; color: #64748b; display: flex; align-items: center; gap: 0.8rem;">
+                <span><i class="fas fa-id-badge" style="margin-right: 0.3rem;"></i>MCK-ID: MCK-{{ '%07d' % user.id
+                    }}</span>
+                <a href="{{ url_for('public_profile', mck_id='MCK-%07d' % user.id) }}"
+                    style="color: var(--primary); font-size: 0.82rem; text-decoration: none;">
+                    <i class="fas fa-user-check"></i> View Public Profile
+                </a>
+            </p>
+        </div>
+        <button onclick="enterEditMode()" class="btn-outline-sm" style="background: transparent; cursor: pointer;">
+            <i class="fas fa-pen"></i> Edit Profile
+        </button>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="profile-grid">
+
+        <!-- LEFT COLUMN -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Student Verification Card -->
+            <div class="profile-card">
+                <h3 class="profile-card-title"><i class="fas fa-shield-halved"></i> Student Verification</h3>
+
+                {% if kyc %}
+                {% if kyc.status == 'pending' %}
+                <div class="kyc-pill kyc-pill-pending">
+                    <i class="fas fa-clock"></i> Pending Review
+                </div>
+                <p style="font-size: 0.83rem; color: var(--text-muted); margin: 0.8rem 0 1rem;">
+                    <i class="fas fa-bell" style="color:#f59e0b;"></i>
+                    Your verification is under review. We'll notify you once it's complete.
+                </p>
+                <a href="{{ url_for('kyc') }}" class="btn-outline-sm" style="width: 100%; text-align: center;">
+                    <i class="fas fa-rotate"></i> Update/Resubmit KYC
+                </a>
+                {% elif kyc.status == 'approved' %}
+                <div class="kyc-pill kyc-pill-approved">
+                    <i class="fas fa-check-circle"></i> Verified ✅
+                </div>
+                <p style="font-size: 0.83rem; color: #166534; margin: 0.8rem 0 0;">You are a verified student on
+                    CampusKart.</p>
+                {% elif kyc.status == 'rejected' %}
+                <div class="kyc-pill kyc-pill-rejected">
+                    <i class="fas fa-times-circle"></i> Rejected
+                </div>
+                <p style="font-size: 0.83rem; color: #991b1b; margin: 0.8rem 0 1rem;">
+                    Reason: {{ kyc.admin_note or 'Document unclear.' }}
+                </p>
+                <a href="{{ url_for('kyc') }}" class="btn-outline-sm" style="width: 100%; text-align: center;">
+                    <i class="fas fa-rotate"></i> Resubmit KYC
+                </a>
+                {% endif %}
+                {% else %}
+                <div class="kyc-pill kyc-pill-none">
+                    <i class="fas fa-exclamation-circle"></i> Not Submitted
+                </div>
+                <p style="font-size: 0.83rem; color: var(--text-muted); margin: 0.8rem 0 1rem;">Submit your documents to
+                    unlock all features.</p>
+                <a href="{{ url_for('kyc') }}" class="btn-primary"
+                    style="display: block; text-align: center; padding: 0.6rem;">
+                    <i class="fas fa-arrow-right"></i> Start Verification
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Seller Performance Card -->
+            <div class="profile-card">
+                <h3 class="profile-card-title"><i class="fas fa-star" style="color:#f59e0b;"></i> Seller Performance
+                    &amp; Campus Stats</h3>
+                <div
+                    style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="font-size: 0.78rem; font-weight: 700; color: #92400e; margin: 0;">⭐ My Seller
+                                Rating</p>
+                            <p style="font-size: 0.72rem; color: #b45309; margin: 0;">{{ deals_done }} reviews · Start
+                                selling!</p>
+                        </div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #f59e0b;">{{ '%.1f' % seller_rating }}
+                        </div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem;">
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-num">{{ deals_done }}</div>
+                        <div class="stat-mini-label"><i class="fas fa-handshake"></i> Deals Done</div>
+                    </div>
+                    <div class="stat-mini-card">
+                        <div class="stat-mini-num"
+                            style="color: {{ '#ef4444' if not kyc or kyc.status != 'approved' else '#10b981' }};">
+                            {{ 'YES' if kyc and kyc.status == 'approved' else 'NO' }}
+                        </div>
+                        <div class="stat-mini-label"><i class="fas fa-id-card"></i> Verified Badge</div>
+                    </div>
+                </div>
+                <div class="stat-mini-card" style="text-align: center;">
+                    <div class="stat-mini-num" style="color: var(--primary);">0</div>
+                    <div class="stat-mini-label"><i class="fas fa-coins"></i> Campus Points</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="profile-card" style="align-self: start;">
+            <!-- Tabs -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="switchTab('info', this)">
+                    <i class="fas fa-user"></i> Profile Info
+                </button>
+                <button class="profile-tab" onclick="switchTab('listings', this)">
+                    <i class="fas fa-boxes"></i> My Listings
+                </button>
+            </div>
+
+            <!-- Profile Info Tab -->
+            <div id="tab-info">
+                <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 0.3rem;">
+                    <i class="fas fa-address-card" style="color: var(--primary);"></i> Contact &amp; Academic
+                    Information
+                </h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1.5rem;">
+                    Update your details. These fields are used for verification and deal coordination.
+                </p>
+                <form id="profileUpdateForm" action="{{ url_for('profile_edit') }}" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">Full Name</label>
+                            <input type="text" name="username" value="{{ user.username }}" placeholder="Om Ahire">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">Phone Number</label>
+                            <input type="text" name="phone" value="{{ user.phone or '' }}" placeholder="+91...">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">College</label>
+                            <input type="text" name="college" value="{{ user.college }}" placeholder="College name">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">College/Department</label>
+                            <input type="text" name="department" value="{{ user.department or '' }}"
+                                placeholder="e.g. CS Dept">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">Student ID</label>
+                            <input type="text" name="student_id_num" value="{{ user.student_id_num or '' }}"
+                                placeholder="e.g. BT-CSE">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">Course</label>
+                            <input type="text" name="course" value="{{ user.course or '' }}"
+                                placeholder="e.g. B.tech CSE">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">Batch</label>
+                            <input type="text" name="batch" value="{{ user.batch or '' }}" placeholder="e.g. 2021-2025">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: 0.8rem;">Hostel/Residence</label>
+                            <input type="text" name="hostel" value="{{ user.hostel or '' }}"
+                                placeholder="e.g. Block A-1">
+                        </div>
+                    </div>
+                    <div id="bottomSaveBtn" style="display: none;">
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- My Listings Tab -->
+            <div id="tab-listings" style="display: none;">
+                {% if my_listings %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for p in my_listings %}
+                    <div
+                        style="display: flex; gap: 1rem; align-items: center; padding: 0.8rem; border: 1px solid var(--border); border-radius: 12px;">
+                        <img src="{{ p.first_image if p.is_external else url_for('uploaded_file', filename=p.first_image) if p.first_image else 'https://placehold.co/60x60?text=Item' }}"
+                            style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 0.9rem;">{{ p.name }}</div>
+                            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ p.category }}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 800; color: var(--primary);">₹{{ p.price }}</div>
+                            <span
+                                class="badge {% if p.status == 'available' %}badge-user{% else %}badge-admin{% endif %}"
+                                style="font-size: 0.7rem;">
+                                {{ p.status|upper }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                    <i class="fas fa-box-open"
+                        style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 1rem;"></i>
+                    <p>No listings yet.</p>
+                    <a href="{{ url_for('add_product') }}" class="btn-primary"
+                        style="display: inline-block; margin-top: 0.5rem;">Sell Something</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-header-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .profile-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        font-size: 2rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .ap-back-btn {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 1.5px solid #000;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        background: white;
+    }
+
+    .ap-back-btn:hover {
+        background: #f8fafc;
+        transform: translateY(-1px);
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .profile-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .profile-card-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin: 0 0 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-main);
+    }
+
+    .kyc-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.9rem;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .kyc-pill-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .kyc-pill-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .kyc-pill-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .kyc-pill-none {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .stat-mini-card {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+    }
+
+    .stat-mini-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .stat-mini-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.1rem;
+    }
+
+    .profile-tabs {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 1.5rem;
+        gap: 4px;
+    }
+
+    .profile-tab {
+        flex: 1;
+        padding: 0.55rem;
+        border: none;
+        background: transparent;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.2s;
+    }
+
+    .profile-tab.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-outline-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 1rem;
+        border: 1.5px solid var(--primary);
+        border-radius: 10px;
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.84rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-outline-sm:hover {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+    }
+
+    @media (max-width: 768px) {
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-header-card {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+<script>
+    function switchTab(tab, btn) {
+        document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-info').style.display = tab === 'info' ? 'block' : 'none';
+        document.getElementById('tab-listings').style.display = tab === 'listings' ? 'block' : 'none';
+    }
+
+    function enterEditMode() {
+        document.getElementById('editHeader').style.display = 'flex';
+        document.getElementById('mainProfileHeader').style.display = 'none';
+        document.getElementById('profileHeaderCard').style.display = 'none';
+
+        let bottomSave = document.getElementById('bottomSaveBtn');
+        if (bottomSave) bottomSave.style.display = 'none';
+
+        switchTab('info', document.querySelectorAll('.profile-tab')[0]);
+
+        if (window.innerWidth > 768) {
+            let leftCol = document.querySelector('.profile-grid > div:first-child');
+            if (leftCol) leftCol.style.display = 'none';
+            document.querySelector('.profile-grid').style.gridTemplateColumns = '1fr';
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById('editHeader').style.display = 'none';
+        document.getElementById('mainProfileHeader').style.display = 'flex';
+        document.getElementById('profileHeaderCard').style.display = 'flex';
+
+        if (window.innerWidth > 768) {
+            let leftCol = document.querySelector('.profile-grid > div:first-child');
+            if (leftCol) leftCol.style.display = 'flex';
+            document.querySelector('.profile-grid').style.gridTemplateColumns = '320px 1fr';
+        }
+    }
+
+    // Monitor changes for Save button
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('profileUpdateForm');
+        if (form) {
+            form.addEventListener('input', () => {
+                const bottomBtn = document.getElementById('bottomSaveBtn');
+                const headerBtn = document.getElementById('headerSaveBtn');
+                if (bottomBtn) bottomBtn.style.display = 'block';
+                if (headerBtn) headerBtn.style.display = 'block';
+            });
+        }
+    });
+</script>
+{% endblock %}

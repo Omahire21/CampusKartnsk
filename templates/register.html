@@ -4,7 +4,14 @@
 <div class="auth-page">
     <div class="auth-container">
         <h2 style="text-align: center; margin-bottom: 2rem;">Join the Community</h2>
-        <form action="{{ url_for('register') }}" method="POST">
+
+        <!-- Tab Switcher -->
+        <div class="auth-tabs">
+            <a href="{{ url_for('login') }}" class="auth-tab">Login</a>
+            <a href="{{ url_for('register') }}" class="auth-tab active">Register</a>
+        </div>
+
+        <form action="{{ url_for('register') }}" method="POST" id="registerForm">
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" name="username" required placeholder="Mohit Ahire">
@@ -31,62 +38,167 @@
                 </div>
             </div>
 
-            <script>
-                const searchInput = document.getElementById('collegeSearch');
-                const dropdown = document.getElementById('collegeDropdown');
-                const hiddenInput = document.getElementById('collegeValue');
-                const items = dropdown.getElementsByClassName('dropdown-item');
-
-                searchInput.addEventListener('focus', () => {
-                    dropdown.style.display = 'block';
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-                        dropdown.style.display = 'none';
-                    }
-                });
-
-                searchInput.addEventListener('input', () => {
-                    const filter = searchInput.value.toLowerCase();
-                    let hasResults = false;
-                    for (let i = 0; i < items.length; i++) {
-                        const text = items[i].innerText.toLowerCase();
-                        if (text.includes(filter)) {
-                            items[i].style.display = 'block';
-                            hasResults = true;
-                        } else {
-                            items[i].style.display = 'none';
-                        }
-                    }
-                    dropdown.style.display = hasResults ? 'block' : 'none';
-                });
-
-                for (let i = 0; i < items.length; i++) {
-                    items[i].addEventListener('click', function () {
-                        const val = this.getAttribute('data-value');
-                        searchInput.value = val;
-                        hiddenInput.value = val;
-                        dropdown.style.display = 'none';
-                    });
-                }
-            </script>
-
-            <style>
-                .dropdown-item:hover {
-                    background: #f1f5f9;
-                    color: var(--primary);
-                }
-            </style>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required placeholder="••••••••">
+            <!-- Password Row: Create + Confirm side by side -->
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1; position: relative;">
+                    <label>Password</label>
+                    <input type="password" name="password" id="regPassword" required placeholder="Create"
+                        style="padding-right: 2.8rem; width: 100%;">
+                    <span class="toggle-password" onclick="togglePassword('regPassword', this)"
+                        style="position: absolute; right: 0.9rem; top: 2.65rem; cursor: pointer; color: #94a3b8; font-size: 1.1rem; user-select: none;">👁️</span>
+                </div>
+                <div class="form-group" style="flex: 1; position: relative;">
+                    <label>Confirm</label>
+                    <input type="password" name="confirm_password" id="regConfirm" required placeholder="Confirm"
+                        style="padding-right: 2.8rem; width: 100%;">
+                    <span class="toggle-password" onclick="togglePassword('regConfirm', this)"
+                        style="position: absolute; right: 0.9rem; top: 2.65rem; cursor: pointer; color: #94a3b8; font-size: 1.1rem; user-select: none;">👁️</span>
+                </div>
             </div>
+            <div id="pwMatchMsg" style="font-size: 0.82rem; margin-top: -0.6rem; margin-bottom: 0.8rem; display: none;">
+            </div>
+
+            <!-- Terms & Conditions Checkbox -->
+            <div class="form-group terms-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" id="regTerms" required>
+                    <span>I agree to the <a href="{{ url_for('terms') }}" style="color: var(--primary);">Terms &amp;
+                            Conditions</a></span>
+                </label>
+            </div>
+
             <button type="submit" class="btn-primary" style="width: 100%;">Create Account</button>
         </form>
+
         <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
             Already have an account? <a href="{{ url_for('login') }}" style="color: var(--primary);">Login</a>
         </p>
     </div>
 </div>
+
+<style>
+    .auth-tabs {
+        display: flex;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.65rem;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+
+    .auth-tab.active {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .auth-tab:hover:not(.active) {
+        background: #f1f5f9;
+    }
+
+    .dropdown-item:hover {
+        background: #f1f5f9;
+        color: var(--primary);
+    }
+
+    .terms-group {
+        margin: 0.4rem 0 1.1rem;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+</style>
+
+<script>
+    /* ---------- College dropdown ---------- */
+    const searchInput = document.getElementById('collegeSearch');
+    const dropdown = document.getElementById('collegeDropdown');
+    const hiddenInput = document.getElementById('collegeValue');
+    const items = dropdown.getElementsByClassName('dropdown-item');
+
+    searchInput.addEventListener('focus', () => { dropdown.style.display = 'block'; });
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+    searchInput.addEventListener('input', () => {
+        const filter = searchInput.value.toLowerCase();
+        let hasResults = false;
+        for (let i = 0; i < items.length; i++) {
+            const text = items[i].innerText.toLowerCase();
+            if (text.includes(filter)) { items[i].style.display = 'block'; hasResults = true; }
+            else { items[i].style.display = 'none'; }
+        }
+        dropdown.style.display = hasResults ? 'block' : 'none';
+    });
+    for (let i = 0; i < items.length; i++) {
+        items[i].addEventListener('click', function () {
+            searchInput.value = this.getAttribute('data-value');
+            hiddenInput.value = this.getAttribute('data-value');
+            dropdown.style.display = 'none';
+        });
+    }
+
+    /* ---------- Show / Hide password ---------- */
+    function togglePassword(fieldId, btn) {
+        const field = document.getElementById(fieldId);
+        field.type = (field.type === 'password') ? 'text' : 'password';
+        btn.textContent = (field.type === 'text') ? '🙈' : '👁️';
+    }
+
+    /* ---------- Password match check ---------- */
+    const pwField = document.getElementById('regPassword');
+    const cfField = document.getElementById('regConfirm');
+    const pwMsg = document.getElementById('pwMatchMsg');
+
+    function checkMatch() {
+        if (cfField.value === '') { pwMsg.style.display = 'none'; return; }
+        pwMsg.style.display = 'block';
+        if (pwField.value === cfField.value) {
+            pwMsg.textContent = '✅ Passwords match';
+            pwMsg.style.color = '#16a34a';
+        } else {
+            pwMsg.textContent = '❌ Passwords do not match';
+            pwMsg.style.color = '#dc2626';
+        }
+    }
+    pwField.addEventListener('input', checkMatch);
+    cfField.addEventListener('input', checkMatch);
+
+    /* ---------- Block submit if passwords don't match ---------- */
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        if (pwField.value !== cfField.value) {
+            e.preventDefault();
+            pwMsg.style.display = 'block';
+            pwMsg.textContent = '❌ Passwords do not match';
+            pwMsg.style.color = '#dc2626';
+            cfField.focus();
+        }
+    });
+</script>
 {% endblock %}

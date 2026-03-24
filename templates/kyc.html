@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin: 2rem auto 4rem;">
+
+    <!-- Status Banner -->
+    {% if kyc %}
+    <div class="kyc-status-banner kyc-status-{{ kyc.status }}">
+        {% if kyc.status == 'pending' %}
+        <i class="fas fa-clock"></i>
+        <div>
+            <strong>Verification Status: Pending</strong>
+            <p>Your documents are under review. We'll notify you once complete.</p>
+        </div>
+        {% elif kyc.status == 'approved' %}
+        <i class="fas fa-check-circle"></i>
+        <div>
+            <strong>Verification Status: Approved ✅</strong>
+            <p>Your identity is verified. You can now buy and sell freely!</p>
+        </div>
+        {% elif kyc.status == 'rejected' %}
+        <i class="fas fa-times-circle"></i>
+        <div>
+            <strong>Verification Status: Rejected</strong>
+            <p>Reason: {{ kyc.admin_note or 'Document unclear or details mismatch.' }} Please resubmit.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- KYC Form Card -->
+    <div class="kyc-card">
+        <div class="kyc-header">
+            <label for="profileUpload" class="kyc-icon-ring"
+                style="position: relative; overflow: hidden; cursor: pointer; padding: 0;">
+                <img id="profilePreview"
+                    src="{% if session.get('profile_pic') %}{{ url_for('uploaded_file', filename=session.get('profile_pic')) }}{% endif %}"
+                    style="display: {% if session.get('profile_pic') %}block{% else %}none{% endif %}; width: 100%; height: 100%; object-fit: cover;">
+                <i class="fas fa-user-shield" id="defaultIcon"
+                    style="display: {% if session.get('profile_pic') %}none{% else %}block{% endif %};"></i>
+                <div
+                    style="position: absolute; bottom: 0; background: rgba(0,0,0,0.5); color: white; width: 100%; font-size: 0.6rem; text-align: center; padding: 3px 0; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%;">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </label>
+            <input type="file" name="profile_pic" id="profileUpload" accept="image/*" style="display: none;"
+                onchange="previewProfile(this)">
+            <div>
+                <h2 style="margin: 0; font-size: 1.4rem; color: var(--text-main);">Student Identity Verification</h2>
+                <p style="color: var(--primary); margin: 0; font-size: 0.9rem;">Complete your <u>verification</u> to
+                    start buying and selling</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('kyc') }}" method="POST" enctype="multipart/form-data" id="kycForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+                <div class="form-group">
+                    <label>Full Name <span style="color:#ef4444">*</span></label>
+                    <input type="text" name="full_name" required placeholder="Om Ahire"
+                        value="{{ kyc.full_name if kyc else session.get('username', '') }}">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number <span style="color:#ef4444">*</span></label>
+                    <input type="tel" name="phone" required placeholder="+91 98765 43210"
+                        value="{{ kyc.phone if kyc else '' }}" pattern="[0-9+\-\s]{10,15}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>College Name <span style="color:#ef4444">*</span></label>
+                <input type="text" name="college_name" required placeholder="Enter your college name"
+                    value="{{ kyc.college_name if kyc else session.get('college', '') }}">
+            </div>
+
+            <div class="form-group">
+                <label>Student ID / Roll Number <span style="color:#ef4444">*</span></label>
+                <input type="text" name="student_id" required placeholder="Enter your student ID or roll number"
+                    value="{{ kyc.student_id if kyc else '' }}">
+            </div>
+
+            <!-- Upload Box -->
+            <div class="form-group">
+                <label>Upload Student ID Card or Aadhaar Card <span style="color:#ef4444">*</span></label>
+                <label for="docUpload" class="kyc-upload-area" id="uploadArea">
+                    <div class="kyc-upload-content">
+                        <i class="fas fa-arrow-up-from-bracket"
+                            style="font-size: 1.6rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                        <div id="uploadText">
+                            <strong>Tap to upload document</strong><br>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">JPG, PNG, PDF (Max 5MB)</span>
+                        </div>
+                    </div>
+                    {% if kyc and kyc.doc_filename %}
+                    <p style="margin-top: 0.5rem; font-size: 0.82rem; color: #10b981;">
+                        <i class="fas fa-file-check"></i> Previously uploaded: {{ kyc.doc_filename }}
+                    </p>
+                    {% endif %}
+                </label>
+                <input type="file" id="docUpload" name="document" accept=".jpg,.jpeg,.png,.pdf" {% if not kyc
+                    %}required{% endif %} style="display: none;" onchange="showFileName(this)">
+            </div>
+
+            <!-- Why section -->
+            <div class="kyc-why-box">
+                <i class="fas fa-shield-halved" style="color: var(--primary);"></i>
+                <div>
+                    <strong>Why do we need verification?</strong>
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">We verify all users to ensure a
+                        safe and <span style="color: var(--primary);">trusted marketplace</span>.</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary"
+                style="width: 100%; margin-top: 1.5rem; padding: 0.9rem; font-size: 1rem;">
+                <i class="fas fa-paper-plane"></i> Submit for Verification
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .kyc-status-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.2rem 1.5rem;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        font-size: 0.92rem;
+    }
+
+    .kyc-status-banner i {
+        font-size: 1.4rem;
+        margin-top: 2px;
+    }
+
+    .kyc-status-banner p {
+        margin: 0.2rem 0 0;
+        color: inherit;
+        opacity: 0.85;
+    }
+
+    .kyc-status-pending {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    .kyc-status-approved {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .kyc-status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .kyc-card {
+        background: white;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        padding: 2.5rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .kyc-header {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .kyc-icon-ring {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        border: 2px solid var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: var(--primary);
+        background: #eef2ff;
+        flex-shrink: 0;
+    }
+
+    .kyc-upload-area {
+        display: block;
+        border: 2px dashed var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+
+    .kyc-upload-area:hover {
+        border-color: var(--primary);
+        background: #eef2ff;
+    }
+
+    .kyc-upload-content {
+        pointer-events: none;
+    }
+
+    .kyc-why-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        margin-top: 1rem;
+        font-size: 0.88rem;
+    }
+
+    .kyc-why-box i {
+        margin-top: 3px;
+        font-size: 1rem;
+    }
+</style>
+
+<script>
+    function showFileName(input) {
+        const area = document.getElementById('uploadArea');
+        if (input.files && input.files[0]) {
+            document.getElementById('uploadText').innerHTML =
+                `<strong style="color:#10b981"><i class="fas fa-check-circle"></i> ${input.files[0].name}</strong><br>
+             <span style="font-size:0.8rem;color:#6b7280;">${(input.files[0].size / 1024).toFixed(1)} KB</span>`;
+            area.style.borderColor = '#10b981';
+            area.style.background = '#f0fdf4';
+        }
+    }
+
+    function previewProfile(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('profilePreview').src = e.target.result;
+                document.getElementById('profilePreview').style.display = 'block';
+                document.getElementById('defaultIcon').style.display = 'none';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

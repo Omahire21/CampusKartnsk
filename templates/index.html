@@ -3,40 +3,48 @@
 {% block content %}
 <header class="hero-slideshow">
     <div class="slides">
-        <!-- Slide 1 -->
+        <!-- Slide 1: Nashik Pride -->
         <div class="slide slide-1 active">
+            <div class="slide-bg" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ url_for('static', filename='images/slideshow/nashik_hero.jpg') }}');"></div>
             <div class="hero-content">
-                <span class="badge-new">#1 College Marketplace</span>
-                <h1>Buy, Sell & Trade <br> on Your Campus</h1>
-                <p>The smartest way for students to save money and find essentials from books to electronics. Exclusive
-                    for verified students.</p>
+                <span class="badge-new">Nashik's Pride</span>
+                <h1>Discover Nashik's <br> Smartest Marketplace</h1>
+                <p>Join thousands of students from KTHM, PVG, Sandip, and more Nashik colleges in a safe, verified
+                    network centered around Godavari's heritage.</p>
                 <div class="hero-actions">
-                    <a href="{{ url_for('products') }}" class="btn-primary">Shop Now</a>
-                    <a href="{{ url_for('register') }}" class="btn-secondary">Get Started</a>
+                    <a href="{{ url_for('products') }}" class="btn-primary">Explore Now</a>
+                    {% if not session.get('user_id') %}
+                    <a href="{{ url_for('register') }}" class="btn-secondary">Join Community</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <!-- Slide 2 -->
+        <!-- Slide 2: CampusKart Value -->
         <div class="slide slide-2">
+            <div class="slide-bg" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ url_for('static', filename='images/slideshow/trading_hero.png') }}');"></div>
             <div class="hero-content">
-                <span class="badge-new">Save Big</span>
-                <h1>Books, Gadgets <br> & Student Life</h1>
-                <p>Don't pay retail prices. Get used textbooks and electronics from your seniors at half the price.</p>
+                <span class="badge-new">Save Money</span>
+                <h1>Buy, Sell & Trade <br> on Your Campus</h1>
+                <p>The smarter way for Nashik students to find essentials from books to electronics. Exclusive for
+                    verified peers.</p>
                 <div class="hero-actions">
-                    <a href="{{ url_for('products') }}" class="btn-primary">Browse Books</a>
-                    <a href="{{ url_for('add_product') }}" class="btn-secondary">Sell Yours</a>
+                    <a href="{{ url_for('products') }}" class="btn-primary">Browse Items</a>
+                    <a href="{{ url_for('add_product') }}" class="btn-secondary">Start Selling</a>
                 </div>
             </div>
         </div>
-        <!-- Slide 3 -->
+        <!-- Slide 3: Trust & Safety -->
         <div class="slide slide-3">
+            <div class="slide-bg" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ url_for('static', filename='images/slideshow/secure_hero.png') }}');"></div>
             <div class="hero-content">
-                <span class="badge-new">Verified Users</span>
-                <h1>Nashik's Premier <br> Student Network</h1>
-                <p>Join thousands of students from KTHM, PVG, Sandip, and more Nashik colleges in a safe marketplace.
-                </p>
+                <span class="badge-new">100% Verified</span>
+                <h1>Secure Student-to-Student <br> Trading</h1>
+                <p>No more strangers. Trade only with verified students from your own or nearby Nashik colleges. Total
+                    peace of mind.</p>
                 <div class="hero-actions">
-                    <a href="{{ url_for('register') }}" class="btn-primary">Join Now</a>
+                    {% if session.get('kyc_status') != 'approved' %}
+                    <a href="{{ url_for('register') }}" class="btn-primary">Verify My ID</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -54,9 +62,25 @@
     <h2 style="margin-bottom: 2rem;">Recently Added</h2>
     <div class="product-grid recent-grid">
         {% for product in products %}
-        <div class="product-card">
-            <img src="{{ product.image_url if (product.image_url and (product.image_url.startswith('http') or product.image_url.startswith('https'))) else url_for('uploaded_file', filename=product.image_url) if product.image_url else 'https://via.placeholder.com/300x200?text=No+Image' }}"
+        <div class="product-card" style="position: relative;">
+            <img src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/300x200?text=No+Image' }}"
                 alt="{{ product.name }}" class="product-image">
+            {% if session.get('user_id') %}
+            <form action="{{ url_for('toggle_favorite', product_id=product.id) }}" method="POST"
+                onsubmit="handleFavorite(event, {{ product.id }})"
+                style="position: absolute; top: 10px; right: 10px; margin: 0; z-index: 10;">
+                <button type="submit"
+                    style="background: white; border: none; width: 35px; height: 35px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                        fill="{{ '#ef4444' if product.id in favorite_ids else 'none' }}" stroke="#ef4444"
+                        stroke-width="2">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
+                    </svg>
+                </button>
+            </form>
+            {% endif %}
             <div class="product-info">
                 <h3>{{ product.name }}</h3>
                 <p class="product-price">₹{{ product.price }}</p>

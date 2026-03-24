@@ -1,72 +1,189 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <a href="{{ url_for('products') }}" style="color: var(--text-muted); display: inline-block; margin-bottom: 2rem;">
-        <i class="fas fa-arrow-left"></i> Back to Marketplace
-    </a>
+<div class="container" style="max-width: 1100px; margin: 2rem auto 5rem;">
+    <!-- Breadcrumbs -->
+    <nav style="margin-bottom: 1.5rem; font-size: 0.82rem; color: var(--text-muted);">
+        <a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">Home</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.6rem; margin: 0 0.5rem;"></i>
+        <a href="{{ url_for('products', category=product.category) }}" style="color: inherit; text-decoration: none;">{{
+            product.category }}</a>
+        <i class="fas fa-chevron-right" style="font-size: 0.6rem; margin: 0 0.5rem;"></i>
+        <span style="color: var(--text-main);">{{ product.name }}</span>
+    </nav>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;">
-        <div class="product-image-container" style="position: relative;">
-            <img src="{{ product.image_url if (product.image_url and (product.image_url.startswith('http') or product.image_url.startswith('https'))) else url_for('uploaded_file', filename=product.image_url) if product.image_url else 'https://via.placeholder.com/600x400?text=No+Image' }}"
-                alt="{{ product.name }}"
-                style="width: 100%; border-radius: 30px; border: 1px solid var(--border); box-shadow: var(--shadow); filter: contrast(0.9) brightness(0.9);">
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: start;">
+        <!-- Left: Image Gallery + Safety -->
+        <div>
+            {% set images = (product.image_url or '').split(',') %}
             <div
-                style="position: absolute; top: 20px; left: 20px; background: var(--primary); color: white; padding: 8px 15px; border-radius: 10px; font-weight: 700; box-shadow: var(--shadow-sm);">
-                GENUINE USED ITEM</div>
+                style="background: white; border: 1px solid var(--border); border-radius: 24px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+                <div
+                    style="position: relative; border-radius: 16px; overflow: hidden; height: 400px; background: #f8fafc; margin-bottom: 1rem;">
+                    <img id="mainImage"
+                        src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/600x400?text=No+Image' }}"
+                        alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+
+                {% if images|length > 1 %}
+                <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 0.5rem;" class="hide-scrollbar">
+                    {% for img in images %}
+                    {% if img %}
+                    <img src="{{ img if img.startswith('http') else url_for('uploaded_file', filename=img) }}"
+                        onclick="document.getElementById('mainImage').src = this.src"
+                        style="width: 70px; height: 70px; border-radius: 10px; object-fit: cover; border: 2px solid transparent; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.borderColor='var(--primary)'"
+                        onmouseout="this.style.borderColor='transparent'">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Safety First Box -->
+            <div
+                style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem;">
+                <div
+                    style="display: flex; align-items: center; gap: 0.6rem; font-weight: 700; color: #1d4ed8; margin-bottom: 0.8rem;">
+                    <i class="fas fa-shield-halved"></i> Safety First
+                </div>
+                <ul style="list-style: disc; padding-left: 1.4rem; color: #1e40af; font-size: 0.85rem; line-height: 2;">
+                    <li>Meet in safe, public places on campus.</li>
+                    <li>Check the item thoroughly before paying.</li>
+                    <li>Keep all chats inside CampusKart.</li>
+                    <li>Never pay in advance for rentals or items.</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="product-details">
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                <span class="badge badge-user">{{ product.category }}</span>
-                <span class="badge" style="background: var(--glass);">{{ product.college }}</span>
+        <!-- Right: Details -->
+        <div>
+            <div style="margin-bottom: 1.5rem;">
+                <h1 style="font-size: 2.2rem; margin: 0 0 0.5rem; color: var(--text-main); font-weight: 800;">{{
+                    product.name }}</h1>
+                <div
+                    style="display: flex; align-items: center; gap: 1rem; color: var(--text-muted); font-size: 0.82rem; flex-wrap: wrap;">
+                    <span><i class="far fa-eye"></i> {{ product.views }} views</span>
+                    <span><i class="far fa-calendar"></i> {{ product.posted_date }}</span>
+                    <span><i class="fas fa-location-dot"></i> {{ product.college }}</span>
+                </div>
             </div>
 
-            <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">{{ product.name }}</h1>
-            <p class="product-price" style="font-size: 2rem; margin-bottom: 2rem;">₹{{ product.price }}</p>
-
-            <div style="background: var(--glass); padding: 1.5rem; border-radius: 20px; margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-main);">Condition / Usage</h3>
-                <p style="color: var(--primary); font-weight: 700; font-size: 1.1rem; margin-bottom: 1.5rem;">
-                    <i class="fas fa-history"></i> {{ product.usage_info }}
-                </p>
-
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-main);">Description</h3>
-                <p style="color: var(--text-muted); line-height: 1.6;">{{ product.description }}</p>
-            </div>
+            <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 2rem;">₹{{
+                product.price }}</div>
 
             <div
-                style="display: flex; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--glass-border); border-radius: 20px;">
+                style="background: white; border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 0.8rem; font-size: 1rem; color: var(--text-main);">Description</h3>
+                <p style="color: var(--text-muted); line-height: 1.6; font-size: 0.92rem; margin: 0;">{{
+                    product.description }}</p>
+
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Product Condition:
+                    </div>
+                    <div style="color: var(--primary); font-weight: 700; font-size: 1rem;">
+                        <i class="fas fa-check-circle"></i> {{ product.usage_info or 'Used' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seller Profile Section -->
+            <a href="{{ url_for('public_profile', mck_id='MCK-%07d' % product.seller_id) }}"
+                style="display: flex; align-items: center; gap: 1rem; padding: 1.2rem; border: 1px solid var(--border); border-radius: 20px; margin-bottom: 2rem; text-decoration: none; color: inherit; transition: all 0.2s; background: white;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)';"
+                onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
                 <div
-                    style="width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;">
+                    style="width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; flex-shrink: 0;">
                     {{ product.seller_name[0] | upper }}
                 </div>
-                <div>
-                    <h4 style="margin: 0;">{{ product.seller_name }}</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Seller from {{ product.college }}</p>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 0.4rem;">
+                        {{ product.seller_name }}
+                        <i class="fas fa-check-circle" style="color: #10b981; font-size: 0.85rem;"
+                            title="Verified Seller"></i>
+                        <span
+                            style="font-size: 0.65rem; background: #f0fdf4; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Verified</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Member since March
+                        2026</div>
                 </div>
+                <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+            </a>
 
-                {% if session.get('user_id') %}
-                {% if session['user_id'] != product.seller_id %}
-                <a href="{{ url_for('chat', product_id=product.id, receiver_id=product.seller_id) }}"
-                    class="btn-primary" style="margin-left: auto;">
-                    Chat with Seller
-                </a>
-                {% else %}
-                <div style="margin-left: auto; display: flex; gap: 1rem; align-items: center;">
-                    {% if product.status == 'available' %}
-                    <a href="{{ url_for('mark_product_sold', product_id=product.id) }}" class="btn-primary"
-                        style="background: #22c55e; border: none;">Mark as Sold</a>
-                    {% else %}
-                    <span class="badge" style="background: #fee2e2; color: #ef4444; padding: 0.5rem 1rem;">SOLD</span>
-                    {% endif %}
-                </div>
-                {% endif %}
-                {% else %}
-                <a href="{{ url_for('login') }}" class="btn-primary" style="margin-left: auto;">Login to Chat</a>
-                {% endif %}
+            <!-- Action Section -->
+            {% if session.get('user_id') %}
+            {% if session.get('kyc_status') != 'approved' %}
+            <!-- Verification Required Block -->
+            <div
+                style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 20px; padding: 1.5rem; text-align: center;">
+                <div style="color: #92400e; font-weight: 700; margin-bottom: 0.6rem;">Verification Required</div>
+                <p style="font-size: 0.85rem; color: #78350f; margin-bottom: 1.2rem;">Complete your student KYC to chat
+                    with sellers or buy items.</p>
+                <a href="{{ url_for('kyc') }}" class="btn-primary"
+                    style="display: block; width: 100%; padding: 0.8rem; background: #f59e0b; border: none; box-shadow: none;">Verify
+                    My ID</a>
             </div>
+            {% elif session['user_id'] != product.seller_id %}
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="{{ url_for('chat', product_id=product.id, receiver_id=product.seller_id) }}"
+                    class="btn-primary" style="flex: 1; text-align: center; padding: 1rem; min-width: 200px;">
+                    <i class="fas fa-comment"></i> Chat with Seller
+                </a>
+                <form action="{{ url_for('toggle_favorite', product_id=product.id) }}" method="POST"
+                    onsubmit="handleFavorite(event, {{ product.id }})" style="margin: 0; min-width: 50px;">
+                    <button type="submit"
+                        style="background: white; border: 1px solid var(--border); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: var(--shadow-sm);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                            fill="{{ '#ef4444' if is_favorited else 'none' }}" stroke="#ef4444" stroke-width="2">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                            </path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn-primary"
+                style="display: block; width: 100%; text-align: center; padding: 1rem;">Login to Interested</a>
+            {% endif %}
         </div>
     </div>
+
+    <!-- Related Products: You might also like -->
+    {% if related %}
+    <div style="margin-top: 5rem;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 2rem; color: var(--text-main); font-weight: 800;">You might also
+            like</h2>
+        <div class="product-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            {% for item in related %}
+            <div class="product-card"
+                onclick="window.location.href='{{ url_for('product_detail', product_id=item.id) }}'"
+                style="cursor: pointer; position: relative; height: 320px; border-radius: 20px; overflow: hidden; border: none; box-shadow: var(--shadow-md);">
+
+                <div style="width: 100%; height: 100%; background: #e2e8f0;">
+                    <img src="{{ item.first_image if item.is_external else url_for('uploaded_file', filename=item.first_image) if item.first_image else 'https://via.placeholder.com/400x400?text=Product' }}"
+                        alt="{{ item.name }}"
+                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                </div>
+
+                <!-- Gradient Overlay for Contrast -->
+                <div
+                    style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); pointer-events: none;">
+                </div>
+
+                <!-- White Text Information -->
+                <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem; color: white;">
+                    <h3
+                        style="font-size: 1.1rem; font-weight: 700; margin: 0 0 0.3rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        {{ item.name }}</h3>
+                    <div style="font-weight: 800; font-size: 1.2rem; color: #818cf8;">₹{{ item.price }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

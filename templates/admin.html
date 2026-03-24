@@ -97,8 +97,172 @@
 
     <!-- Tables Grid -->
     <div style="display: grid; grid-template-columns: 1fr; gap: 3rem;">
-        <!-- Users Management -->
+
+        <!-- KYC Verification Requests -->
         <section>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2><i class="fas fa-user-shield" style="color: #f59e0b; margin-right: 0.5rem;"></i> KYC Verification
+                    Requests
+                    {% if kyc_pending_count > 0 %}
+                    <span
+                        style="background: #ef4444; color: white; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 50px; margin-left: 0.5rem; vertical-align: middle;">{{
+                        kyc_pending_count }} Pending</span>
+                    {% endif %}
+                </h2>
+            </div>
+            <div
+                style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
+                {% if kyc_requests %}
+                <table class="admin-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1.25rem;">Student</th>
+                            <th>College</th>
+                            <th>Student ID</th>
+                            <th>Phone</th>
+                            <th>Document</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for k in kyc_requests %}
+                        <tr>
+                            <td style="padding: 1rem 1.25rem;">
+                                <div style="font-weight: 600;">{{ k.full_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ k.user_email }}</div>
+                            </td>
+                            <td style="font-size: 0.85rem;">{{ k.college_name }}</td>
+                            <td style="font-size: 0.85rem;">{{ k.student_id }}</td>
+                            <td style="font-size: 0.85rem;">{{ k.phone }}</td>
+                            <td>
+                                {% if k.doc_filename %}
+                                <a href="{{ url_for('kyc_doc', filename=k.doc_filename) }}" target="_blank"
+                                    style="color: var(--primary); font-size: 0.83rem; text-decoration: none;">
+                                    <i class="fas fa-file-alt"></i> View Doc
+                                </a>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">No doc</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span
+                                    class="badge {% if k.status == 'pending' %}badge-pending{% elif k.status == 'approved' %}badge-approved{% else %}badge-rejected{% endif %}">
+                                    {{ k.status|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if k.status == 'pending' %}
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <form action="{{ url_for('admin_kyc_action') }}" method="POST"
+                                        style="display: inline;">
+                                        <input type="hidden" name="kyc_id" value="{{ k.id }}">
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn-primary"
+                                            style="padding: 0.35rem 0.9rem; font-size: 0.78rem; background: #10b981; border-color: #10b981;"
+                                            onclick="return confirm('Approve this KYC?')">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('admin_kyc_action') }}" method="POST"
+                                        style="display: inline;">
+                                        <input type="hidden" name="kyc_id" value="{{ k.id }}">
+                                        <input type="hidden" name="action" value="reject">
+                                        <input type="text" name="note" placeholder="Rejection reason..." required
+                                            style="padding: 0.3rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 6px; width: 140px;">
+                                        <button type="submit"
+                                            style="padding: 0.35rem 0.9rem; font-size: 0.78rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;"
+                                            onclick="return confirm('Reject this KYC?')">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                                {% else %}
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Actioned</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                    <i class="fas fa-check-double"
+                        style="font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 0.8rem;"></i>
+                    No KYC requests yet.
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- KYC Approved Students -->
+        <section style="margin-bottom: 3rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2><i class="fas fa-user-check" style="color: #10b981; margin-right: 0.5rem;"></i> KYC Approved
+                    Students</h2>
+            </div>
+            <div
+                style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
+                <table class="admin-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1.25rem;">Student Name</th>
+                            <th>College</th>
+                            <th>Role</th>
+                            <th>Action / Messaging</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        {% if user.kyc_status == 'approved' and not user.is_admin %}
+                        <tr>
+                            <td style="padding: 1rem 1.25rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div
+                                        style="width: 35px; height: 35px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #10b981;">
+                                        {{ user.username[0]|upper }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">{{ user.username }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.college }}</td>
+                            <td>
+                                <span class="badge badge-approved">VERIFIED</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                                    <form action="{{ url_for('send_admin_message') }}" method="POST"
+                                        style="display: flex; gap: 0.5rem; margin: 0;">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="text" name="message" placeholder="Message..." required
+                                            style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; width: 130px;">
+                                        <button type="submit" class="btn-primary"
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Send</button>
+                                    </form>
+                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST"
+                                        onsubmit="return confirm('Are you sure you want to completely remove this user? This cannot be undone.')"
+                                        style="margin: 0;">
+                                        <button type="submit"
+                                            style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                                            <i class="fas fa-ban"></i> Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Users Management (Others) -->
+        <section style="margin-bottom: 3rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2><i class="fas fa-users" style="color: var(--primary); margin-right: 0.5rem;"></i> Student Management
                 </h2>
@@ -111,11 +275,12 @@
                             <th style="padding: 1.25rem;">Student Name</th>
                             <th>College</th>
                             <th>Role</th>
-                            <th>Quick Messaging</th>
+                            <th>Action / Messaging</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
+                        {% if user.kyc_status != 'approved' or user.is_admin %}
                         <tr>
                             <td style="padding: 1rem 1.25rem;">
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -138,19 +303,30 @@
                             </td>
                             <td>
                                 {% if not user.is_admin %}
-                                <form action="{{ url_for('send_admin_message') }}" method="POST"
-                                    style="display: flex; gap: 0.5rem;">
-                                    <input type="hidden" name="user_id" value="{{ user.id }}">
-                                    <input type="text" name="message" placeholder="Message student..." required
-                                        style="padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.8rem; flex: 1;">
-                                    <button type="submit" class="btn-primary"
-                                        style="padding: 0.5rem 1rem; font-size: 0.8rem;">Send</button>
-                                </form>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                                    <form action="{{ url_for('send_admin_message') }}" method="POST"
+                                        style="display: flex; gap: 0.5rem; margin: 0;">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="text" name="message" placeholder="Message..." required
+                                            style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; width: 130px;">
+                                        <button type="submit" class="btn-primary"
+                                            style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Send</button>
+                                    </form>
+                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST"
+                                        onsubmit="return confirm('Are you sure you want to completely remove this user? This cannot be undone.')"
+                                        style="margin: 0;">
+                                        <button type="submit"
+                                            style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                                            <i class="fas fa-ban"></i> Remove
+                                        </button>
+                                    </form>
+                                </div>
                                 {% else %}
                                 <span style="color: var(--text-muted); font-size: 0.8rem;">System Admin</span>
                                 {% endif %}
                             </td>
                         </tr>
+                        {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -180,7 +356,7 @@
                         <tr>
                             <td style="padding: 1rem 1.25rem;">
                                 <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <img src="{{ product.image_url if 'http' in product.image_url else url_for('uploaded_file', filename=product.image_url) if product.image_url else 'https://via.placeholder.com/50x50?text=No+Image' }}"
+                                    <img src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/50x50?text=No+Image' }}"
                                         style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border);">
                                     <div>
                                         <div style="font-weight: 700;">{{ product.name }}</div>
