@@ -2,29 +2,44 @@ import os
 import firebase_admin
 from firebase_admin import credentials, firestore, auth, storage
 
-# Get from environment or use defaults
-project_id = os.environ.get("FIREBASE_PROJECT_ID", "campuskart-ee453")
+# Get from environment
+project_id = os.environ.get("FIREBASE_PROJECT_ID", "")
 private_key = os.environ.get("FIREBASE_PRIVATE_KEY", "")
 client_email = os.environ.get("FIREBASE_CLIENT_EMAIL", "")
 private_key_id = os.environ.get("FIREBASE_PRIVATE_KEY_ID", "")
 client_id = os.environ.get("FIREBASE_CLIENT_ID", "")
-storage_bucket = os.environ.get("FIREBASE_STORAGE_BUCKET", f"{project_id}.appspot.com")
+storage_bucket = os.environ.get("FIREBASE_STORAGE_BUCKET", "")
 
-# Build config - only if we have the private key
+# Debug: print what we got
+print(f"FIREBASE_PROJECT_ID: {project_id}")
+print(f"FIREBASE_PRIVATE_KEY set: {bool(private_key)}")
+print(f"FIREBASE_CLIENT_EMAIL: {client_email}")
+print(f"FIREBASE_STORAGE_BUCKET: {storage_bucket}")
+
+# Build config only if we have the private key
 firebase_config = None
-if private_key:
-    firebase_config = {
-        "type": "service_account",
-        "project_id": project_id,
-        "private_key_id": private_key_id,
-        "private_key": private_key.replace("\\n", "\n"),
-        "client_email": client_email,
-        "client_id": client_id,
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{client_email}"
-    }
+if private_key and client_email:
+    try:
+        # Replace \\n with actual newlines
+        private_key_formatted = private_key.replace("\\n", "\n")
+        
+        firebase_config = {
+            "type": "service_account",
+            "project_id": project_id,
+            "private_key_id": private_key_id,
+            "private_key": private_key_formatted,
+            "client_email": client_email,
+            "client_id": client_id,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{client_email}"
+        }
+        print("Firebase config built successfully!")
+    except Exception as e:
+        print(f"Error building config: {e}")
+else:
+    print("Missing required Firebase config - will use MySQL fallback")
 
 firebase_initialized = False
 db = None
@@ -36,7 +51,6 @@ def init_firebase():
     if firebase_initialized:
         return db, bucket
     
-    # Check if Firebase is configured
     if not firebase_config:
         print("Firebase not configured - using MySQL fallback")
         return None, None
