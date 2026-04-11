@@ -8,6 +8,17 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'campuskart_secret_key_dev')
 
+# Firebase check
+USE_FIREBASE = True
+try:
+    from firebase_config import init_firebase
+    from firebase_db import fb_db
+    init_firebase()
+    print("Firebase initialized for app")
+except Exception as e:
+    print(f"Firebase init failed: {e}")
+    USE_FIREBASE = False
+
 # Configuration
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -15,7 +26,7 @@ KYC_UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ky
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['KYC_UPLOAD_FOLDER'] = KYC_UPLOAD_FOLDER
 
-# MySQL Connection Details — reads from environment variables (Railway) or falls back to local
+# MySQL Connection Details
 db_config = {
     'host':     os.environ.get('MYSQLHOST',     'localhost'),
     'user':     os.environ.get('MYSQLUSER',     'root'),
