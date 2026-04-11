@@ -1,8 +1,7 @@
 import os
 import firebase_admin
-from firebase_admin import credentials, firestore, auth, storage
+from firebase_admin import credentials, firestore, storage
 
-# Get from environment
 project_id = os.environ.get("FIREBASE_PROJECT_ID", "")
 private_key = os.environ.get("FIREBASE_PRIVATE_KEY", "")
 client_email = os.environ.get("FIREBASE_CLIENT_EMAIL", "")
@@ -10,36 +9,21 @@ private_key_id = os.environ.get("FIREBASE_PRIVATE_KEY_ID", "")
 client_id = os.environ.get("FIREBASE_CLIENT_ID", "")
 storage_bucket = os.environ.get("FIREBASE_STORAGE_BUCKET", "")
 
-# Debug: print what we got
-print(f"FIREBASE_PROJECT_ID: {project_id}")
-print(f"FIREBASE_PRIVATE_KEY set: {bool(private_key)}")
-print(f"FIREBASE_CLIENT_EMAIL: {client_email}")
-print(f"FIREBASE_STORAGE_BUCKET: {storage_bucket}")
-
-# Build config only if we have the private key
 firebase_config = None
 if private_key and client_email:
-    try:
-        # Replace \\n with actual newlines
-        private_key_formatted = private_key.replace("\\n", "\n")
-        
-        firebase_config = {
-            "type": "service_account",
-            "project_id": project_id,
-            "private_key_id": private_key_id,
-            "private_key": private_key_formatted,
-            "client_email": client_email,
-            "client_id": client_id,
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{client_email}"
-        }
-        print("Firebase config built successfully!")
-    except Exception as e:
-        print(f"Error building config: {e}")
-else:
-    print("Missing required Firebase config - will use MySQL fallback")
+    private_key_formatted = private_key.replace("\\n", "\n")
+    firebase_config = {
+        "type": "service_account",
+        "project_id": project_id,
+        "private_key_id": private_key_id,
+        "private_key": private_key_formatted,
+        "client_email": client_email,
+        "client_id": client_id,
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": f"https://www.googleapis.com/robot/v1/metadata/x509/{client_email}"
+    }
 
 firebase_initialized = False
 db = None
@@ -58,14 +42,11 @@ def init_firebase():
     try:
         if not firebase_admin._apps:
             cred = credentials.Certificate(firebase_config)
-            firebase_admin.initialize_app(cred, {
-                'storageBucket': storage_bucket
-            })
+            firebase_admin.initialize_app(cred, {'storageBucket': storage_bucket})
         
         db = firestore.client()
         bucket = storage.bucket(storage_bucket)
         firebase_initialized = True
-        
         print("Firebase initialized successfully!")
         return db, bucket
         
