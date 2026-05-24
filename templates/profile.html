@@ -26,10 +26,10 @@
     </div>
 
     <!-- Profile Header -->
-    <div class="profile-header-card" id="profileHeaderCard">
-        <div class="profile-avatar" style="overflow: hidden; position: relative; padding: 0;">
+    <div class="profile-header-card" id="profileHeaderCard" style="display: flex; align-items: center; gap: 1.5rem; padding: 2rem; background: white; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 2rem; position: relative;">
+        <div class="profile-avatar" style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; position: relative; padding: 0; flex-shrink: 0; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             <label for="profileImageUpdate"
-                style="cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0;">
+                style="cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; background: var(--primary); color: white; font-size: 2rem; font-weight: 700;">
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('uploaded_file', filename=session.get('profile_pic')) }}"
                     style="width: 100%; height: 100%; object-fit: cover;">
@@ -48,20 +48,22 @@
             </form>
         </div>
         <div style="flex: 1;">
-            <h1 style="font-size: 1.7rem; margin: 0 0 0.2rem; color: var(--text-main);">{{ user.username }}</h1>
-            <p style="color: var(--text-muted); margin: 0 0 0.5rem; font-size: 0.9rem;">
+            <h1 style="font-size: 1.7rem; margin: 0 0 0.3rem; color: var(--text-main);">{{ user.username }}</h1>
+            <p style="color: var(--text-muted); margin: 0 0 0.8rem; font-size: 0.9rem;">
                 <i class="fas fa-envelope" style="color: var(--primary); margin-right: 0.3rem;"></i>{{ user.email }}
             </p>
-            <p style="margin: 0; font-size: 0.82rem; color: #64748b; display: flex; align-items: center; gap: 0.8rem;">
-                <span><i class="fas fa-id-badge" style="margin-right: 0.3rem;"></i>MCK-ID: MCK-{{ '%07d' % user.id
-                    }}</span>
-                <a href="{{ url_for('public_profile', mck_id='MCK-%07d' % user.id) }}"
-                    style="color: var(--primary); font-size: 0.82rem; text-decoration: none;">
-                    <i class="fas fa-user-check"></i> View Public Profile
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <span style="font-size: 0.82rem; color: #64748b; background: #f8fafc; padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <i class="fas fa-id-badge" style="margin-right: 0.3rem;"></i>Member ID: {{ user.mck_id or user.id }}
+                </span>
+                <a href="{{ url_for('public_profile', mck_id=user.mck_id or 'MCK-' + user.id) }}"
+                    style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.8rem; background: #f1f5f9; color: var(--primary); border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid #e2e8f0; transition: background 0.2s;"
+                    onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
+                    <i class="fas fa-external-link-alt"></i> View Public Profile
                 </a>
-            </p>
+            </div>
         </div>
-        <button onclick="enterEditMode()" class="btn-outline-sm" style="background: transparent; cursor: pointer;">
+        <button onclick="enterEditMode()" class="btn-outline-sm" style="background: transparent; cursor: pointer; position: absolute; top: 1.5rem; right: 1.5rem;">
             <i class="fas fa-pen"></i> Edit Profile
         </button>
     </div>
@@ -481,14 +483,37 @@
     }
 
     // Monitor changes for Save button
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('turbo:load', () => {
         const form = document.getElementById('profileUpdateForm');
         if (form) {
-            form.addEventListener('input', () => {
+            // Store initial values of all inputs
+            const initialValues = {};
+            Array.from(form.elements).forEach(el => {
+                if(el.name) initialValues[el.name] = el.value;
+            });
+
+            // Prevent stacking event listeners on multiple turbo loads
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+
+            newForm.addEventListener('input', () => {
+                let isDirty = false;
+                Array.from(newForm.elements).forEach(el => {
+                    if(el.name && el.value !== initialValues[el.name]) {
+                        isDirty = true;
+                    }
+                });
+
                 const bottomBtn = document.getElementById('bottomSaveBtn');
                 const headerBtn = document.getElementById('headerSaveBtn');
-                if (bottomBtn) bottomBtn.style.display = 'block';
-                if (headerBtn) headerBtn.style.display = 'block';
+                
+                if (isDirty) {
+                    if (bottomBtn) bottomBtn.style.display = 'block';
+                    if (headerBtn) headerBtn.style.display = 'block';
+                } else {
+                    if (bottomBtn) bottomBtn.style.display = 'none';
+                    if (headerBtn) headerBtn.style.display = 'none';
+                }
             });
         }
     });

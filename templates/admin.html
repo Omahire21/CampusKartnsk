@@ -4,298 +4,279 @@
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="container" style="max-width: 1400px; margin-top: 2rem;">
-    <!-- Professional Welcome Header -->
-    <div
-        style="background: white; padding: 2rem; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 2.5rem; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 800;">Admin
-                Dashboard</h1>
-            <p style="color: var(--text-muted); font-size: 1rem;">Comprehensive overview of CampusKart Nashik activity.
-            </p>
+<style>
+    /* Admin Layout Styles */
+    body {
+        background-color: #f8fafc;
+    }
+    
+    .admin-wrapper {
+        display: flex;
+        min-height: calc(100vh - 70px);
+        margin: 0;
+        padding: 0;
+    }
+    
+    .admin-sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid var(--border);
+        padding: 2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        position: sticky;
+        top: 70px;
+        height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+    
+    .admin-nav-item {
+        padding: 0.9rem 1.2rem;
+        border-radius: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+    
+    .admin-nav-item:hover {
+        background: #f1f5f9;
+        color: var(--primary);
+    }
+    
+    .admin-nav-item.active {
+        background: rgba(108, 76, 241, 0.08);
+        color: var(--primary);
+        border-color: rgba(108, 76, 241, 0.2);
+    }
+    
+    .admin-content {
+        flex: 1;
+        padding: 2.5rem 3rem;
+        overflow-y: auto;
+    }
+    
+    .admin-section {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .admin-section.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .chat-bubble-admin {
+        padding: 1rem;
+        border-radius: 16px;
+        background: white;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        margin-bottom: 1rem;
+    }
+    
+    /* Responsive Admin Panel */
+    @media (max-width: 900px) {
+        .admin-wrapper {
+            flex-direction: column;
+        }
+        
+        .admin-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            top: 0;
+            flex-direction: row;
+            overflow-x: auto;
+            padding: 1rem;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        
+        .admin-sidebar h3 {
+            display: none; /* Hide 'Admin Menu' text on mobile to save space */
+        }
+        
+        .admin-content {
+            padding: 1.5rem 1rem;
+        }
+        
+        .admin-section .admin-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<div class="admin-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="admin-sidebar">
+        <h3 style="margin-bottom: 1.5rem; color: var(--text-main); font-weight: 800; padding-left: 0.5rem; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Admin Menu</h3>
+        
+        <div class="admin-nav-item active" onclick="switchTab('dashboard', this)">
+            <i class="fas fa-chart-line" style="width: 20px; text-align: center;"></i> Dashboard
         </div>
-        <div style="text-align: right;">
-            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">SYSTEM STATUS</div>
-            <div
-                style="color: #10b981; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end;">
-                <span
-                    style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);"></span>
-                Operational
-            </div>
+        <div class="admin-nav-item" onclick="switchTab('students', this)">
+            <i class="fas fa-users" style="width: 20px; text-align: center;"></i> Students
+        </div>
+        <div class="admin-nav-item" onclick="switchTab('listings', this)">
+            <i class="fas fa-boxes" style="width: 20px; text-align: center;"></i> Listings
+        </div>
+        <div class="admin-nav-item" onclick="switchTab('kyc', this)">
+            <i class="fas fa-user-shield" style="width: 20px; text-align: center;"></i> KYC Approvals
+            {% if kyc_pending_count > 0 %}
+            <span style="background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 50px; margin-left: auto;">{{ kyc_pending_count }}</span>
+            {% endif %}
+        </div>
+        <div class="admin-nav-item" onclick="switchTab('reports', this)">
+            <i class="fas fa-flag" style="width: 20px; text-align: center;"></i> Reports
+            {% if reports|length > 0 %}
+            <span style="background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 50px; margin-left: auto;">{{ reports|length }}</span>
+            {% endif %}
+        </div>
+        <div class="admin-nav-item" onclick="switchTab('inbox', this)">
+            <i class="fas fa-inbox" style="width: 20px; text-align: center;"></i> Admin Inbox
+            {% if admin_inbox|length > 0 %}
+            <span style="background: var(--primary); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 50px; margin-left: auto;">{{ admin_inbox|length }}</span>
+            {% endif %}
+        </div>
+        <div class="admin-nav-item" onclick="switchTab('chats', this)">
+            <i class="fas fa-comments" style="width: 20px; text-align: center;"></i> Platform Chats
         </div>
     </div>
 
-    <!-- Metric Cards Grid -->
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
-        <div
-            style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
-            <div
-                style="width: 50px; height: 50px; background: #e0e7ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                <i class="fas fa-user-grad"></i>
-            </div>
+    <!-- Main Content Area -->
+    <div class="admin-content">
+        
+        <!-- Header -->
+        <div style="background: white; padding: 1.5rem 2rem; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 2.5rem; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <p
-                    style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">
-                    TOTAL STUDENTS</p>
-                <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ stats.user_count }}</h2>
+                <h1 id="pageTitle" style="font-size: 1.8rem; margin-bottom: 0.2rem; color: var(--text-main); font-weight: 800;">Dashboard Overview</h1>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Comprehensive overview of CampusKart Nashik activity.</p>
             </div>
-        </div>
-        <div
-            style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
-            <div
-                style="width: 50px; height: 50px; background: #dcfce7; color: #166534; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                <i class="fas fa-shopping-bag"></i>
-            </div>
-            <div>
-                <p
-                    style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">
-                    ACTIVE LISTINGS</p>
-                <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ stats.available_count }}</h2>
-            </div>
-        </div>
-        <div
-            style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
-            <div
-                style="width: 50px; height: 50px; background: #fee2e2; color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div>
-                <p
-                    style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">
-                    SOLD OUT</p>
-                <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ stats.sold_count }}</h2>
-            </div>
-        </div>
-        <div
-            style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
-            <div
-                style="width: 50px; height: 50px; background: #fef3c7; color: #b45309; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                <i class="fas fa-exchange-alt"></i>
-            </div>
-            <div>
-                <p
-                    style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">
-                    TOTAL CHATS</p>
-                <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ recent_messages|length }}</h2>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Section -->
-    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-bottom: 3rem;">
-        <div
-            style="background: white; padding: 2rem; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-md);">
-            <h3 style="margin-bottom: 1.5rem;">Inventory Status</h3>
-            <canvas id="inventoryChart" style="max-height: 300px;"></canvas>
-        </div>
-        <div
-            style="background: white; padding: 2rem; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-md);">
-            <h3 style="margin-bottom: 1.5rem;">Category Popularity</h3>
-            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
-        </div>
-    </div>
-
-    <!-- Tables Grid -->
-    <div style="display: grid; grid-template-columns: 1fr; gap: 3rem;">
-
-        <!-- KYC Verification Requests -->
-        <section>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><i class="fas fa-user-shield" style="color: #f59e0b; margin-right: 0.5rem;"></i> KYC Verification
-                    Requests
-                    {% if kyc_pending_count > 0 %}
-                    <span
-                        style="background: #ef4444; color: white; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 50px; margin-left: 0.5rem; vertical-align: middle;">{{
-                        kyc_pending_count }} Pending</span>
-                    {% endif %}
-                </h2>
-            </div>
-            <div
-                style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
-                {% if kyc_requests %}
-                <table class="admin-table" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th style="padding: 1.25rem;">Student</th>
-                            <th>College</th>
-                            <th>Student ID</th>
-                            <th>Phone</th>
-                            <th>Document</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for k in kyc_requests %}
-                        <tr>
-                            <td style="padding: 1rem 1.25rem;">
-                                <div style="font-weight: 600;">{{ k.full_name }}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ k.user_email }}</div>
-                            </td>
-                            <td style="font-size: 0.85rem;">{{ k.college_name }}</td>
-                            <td style="font-size: 0.85rem;">{{ k.student_id }}</td>
-                            <td style="font-size: 0.85rem;">{{ k.phone }}</td>
-                            <td>
-                                {% if k.doc_filename %}
-                                <a href="{{ url_for('kyc_doc', filename=k.doc_filename) }}" target="_blank"
-                                    style="color: var(--primary); font-size: 0.83rem; text-decoration: none;">
-                                    <i class="fas fa-file-alt"></i> View Doc
-                                </a>
-                                {% else %}
-                                <span style="color: var(--text-muted); font-size: 0.8rem;">No doc</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span
-                                    class="badge {% if k.status == 'pending' %}badge-pending{% elif k.status == 'approved' %}badge-approved{% else %}badge-rejected{% endif %}">
-                                    {{ k.status|upper }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if k.status == 'pending' %}
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <form action="{{ url_for('admin_kyc_action') }}" method="POST"
-                                        style="display: inline;">
-                                        <input type="hidden" name="kyc_id" value="{{ k.id }}">
-                                        <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn-primary"
-                                            style="padding: 0.35rem 0.9rem; font-size: 0.78rem; background: #10b981; border-color: #10b981;"
-                                            onclick="return confirm('Approve this KYC?')">
-                                            <i class="fas fa-check"></i> Approve
-                                        </button>
-                                    </form>
-                                    <form action="{{ url_for('admin_kyc_action') }}" method="POST"
-                                        style="display: inline;">
-                                        <input type="hidden" name="kyc_id" value="{{ k.id }}">
-                                        <input type="hidden" name="action" value="reject">
-                                        <input type="text" name="note" placeholder="Rejection reason..." required
-                                            style="padding: 0.3rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 6px; width: 140px;">
-                                        <button type="submit"
-                                            style="padding: 0.35rem 0.9rem; font-size: 0.78rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;"
-                                            onclick="return confirm('Reject this KYC?')">
-                                            <i class="fas fa-times"></i> Reject
-                                        </button>
-                                    </form>
-                                </div>
-                                {% else %}
-                                <span style="font-size: 0.8rem; color: var(--text-muted);">Actioned</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
-                    <i class="fas fa-check-double"
-                        style="font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 0.8rem;"></i>
-                    No KYC requests yet.
+            <div style="text-align: right;">
+                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">SYSTEM STATUS</div>
+                <div style="color: #10b981; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; margin-top: 0.2rem;">
+                    <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);"></span>
+                    Operational
                 </div>
-                {% endif %}
             </div>
-        </section>
+        </div>
 
-        <!-- KYC Approved Students -->
-        <section style="margin-bottom: 3rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><i class="fas fa-user-check" style="color: #10b981; margin-right: 0.5rem;"></i> KYC Approved
-                    Students</h2>
+        <!-- ========================================== -->
+        <!-- TAB 1: DASHBOARD -->
+        <!-- ========================================== -->
+        <div id="dashboard-section" class="admin-section active">
+            <!-- Metric Cards Grid -->
+            <div id="admin-metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+                <div style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 50px; height: 50px; background: #e0e7ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                        <i class="fas fa-user-grad"></i>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">TOTAL STUDENTS</p>
+                        <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ stats.user_count }}</h2>
+                    </div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 50px; height: 50px; background: #dcfce7; color: #166534; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">ACTIVE LISTINGS</p>
+                        <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ stats.available_count }}</h2>
+                    </div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 50px; height: 50px; background: #fee2e2; color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">SOLD OUT</p>
+                        <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ stats.sold_count }}</h2>
+                    </div>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 50px; height: 50px; background: #fef3c7; color: #b45309; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; color: #4b5563; font-weight: 800; margin-bottom: 0.2rem; letter-spacing: 0.025em;">TOTAL CHATS</p>
+                        <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">{{ all_conversations|length }}</h2>
+                    </div>
+                </div>
             </div>
-            <div
-                style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
+
+            <!-- Charts Section -->
+            <div id="admin-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+                <div style="background: white; padding: 2rem; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-md);">
+                    <h3 style="margin-bottom: 1.5rem;">Inventory Status</h3>
+                    <canvas id="inventoryChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div style="background: white; padding: 2rem; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-md);">
+                    <h3 style="margin-bottom: 1.5rem;">Category Popularity</h3>
+                    <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: STUDENTS -->
+        <!-- ========================================== -->
+        <div id="students-section" class="admin-section">
+            <div style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
                 <table class="admin-table" style="width: 100%;">
                     <thead>
                         <tr>
-                            <th style="padding: 1.25rem;">Student Name</th>
+                            <th style="padding: 1.25rem;">Student Info</th>
                             <th>College</th>
+                            <th>Stats</th>
                             <th>Role</th>
                             <th>Action / Messaging</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
-                        {% if user.kyc_status == 'approved' and not user.is_admin %}
+                        {% if user.verification_status != 'approved' or user.is_admin %}
                         <tr>
                             <td style="padding: 1rem 1.25rem;">
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div
-                                        style="width: 35px; height: 35px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #10b981;">
+                                    <div style="width: 35px; height: 35px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary);">
                                         {{ user.username[0]|upper }}
                                     </div>
                                     <div>
+                                        <div style="font-weight: 600;">
                                         <div style="font-weight: 600;">{{ user.username }}</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}
-                                        </div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>{{ user.college }}</td>
                             <td>
-                                <span class="badge badge-approved">VERIFIED</span>
-                            </td>
-                            <td>
-                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
-                                    <form action="{{ url_for('send_admin_message') }}" method="POST"
-                                        style="display: flex; gap: 0.5rem; margin: 0;">
-                                        <input type="hidden" name="user_id" value="{{ user.id }}">
-                                        <input type="text" name="message" placeholder="Message..." required
-                                            style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; width: 130px;">
-                                        <button type="submit" class="btn-primary"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Send</button>
-                                    </form>
-                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST"
-                                        onsubmit="return confirm('Are you sure you want to completely remove this user? This cannot be undone.')"
-                                        style="margin: 0;">
-                                        <button type="submit"
-                                            style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">
-                                            <i class="fas fa-ban"></i> Remove
-                                        </button>
-                                    </form>
+                                <div style="font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.2rem;">
+                                    <i class="fas fa-box" style="width: 14px; text-align: center; color: var(--primary);"></i> {{ user.listing_count }} Listings
                                 </div>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Users Management (Others) -->
-        <section style="margin-bottom: 3rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><i class="fas fa-users" style="color: var(--primary); margin-right: 0.5rem;"></i> Student Management
-                </h2>
-            </div>
-            <div
-                style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
-                <table class="admin-table" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th style="padding: 1.25rem;">Student Name</th>
-                            <th>College</th>
-                            <th>Role</th>
-                            <th>Action / Messaging</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        {% if user.kyc_status != 'approved' or user.is_admin %}
-                        <tr>
-                            <td style="padding: 1rem 1.25rem;">
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div
-                                        style="width: 35px; height: 35px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary);">
-                                        {{ user.username[0]|upper }}
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600;">{{ user.username }}</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}
-                                        </div>
-                                    </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem;">
+                                    <i class="far fa-calendar-alt" style="width: 14px; text-align: center;"></i> {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'Legacy' }}
                                 </div>
+                                {% if user.report_count > 0 %}
+                                <div style="font-size: 0.75rem; font-weight: 700; color: #ef4444; background: #fee2e2; display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px;">
+                                    <i class="fas fa-flag"></i> {{ user.report_count }} Reports
+                                </div>
+                                {% endif %}
                             </td>
-                            <td>{{ user.college }}</td>
                             <td>
                                 <span class="badge {% if user.is_admin %}badge-admin{% else %}badge-user{% endif %}">
                                     {{ 'ADMIN' if user.is_admin else 'STUDENT' }}
@@ -304,20 +285,19 @@
                             <td>
                                 {% if not user.is_admin %}
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
-                                    <form action="{{ url_for('send_admin_message') }}" method="POST"
-                                        style="display: flex; gap: 0.5rem; margin: 0;">
+                                    <form action="{{ url_for('send_admin_message') }}" method="POST" style="display: flex; gap: 0.5rem; margin: 0;">
                                         <input type="hidden" name="user_id" value="{{ user.id }}">
-                                        <input type="text" name="message" placeholder="Message..." required
-                                            style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; width: 130px;">
-                                        <button type="submit" class="btn-primary"
-                                            style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Send</button>
+                                        <input type="text" name="message" placeholder="Message..." required style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; width: 130px;">
+                                        <button type="submit" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Send</button>
                                     </form>
-                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST"
-                                        onsubmit="return confirm('Are you sure you want to completely remove this user? This cannot be undone.')"
-                                        style="margin: 0;">
-                                        <button type="submit"
-                                            style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to completely remove this user? This cannot be undone.')" style="margin: 0;">
+                                        <button type="submit" style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">
                                             <i class="fas fa-ban"></i> Remove
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('promote_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Promote this student to Admin?')" style="margin: 0;">
+                                        <button type="submit" style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                                            <i class="fas fa-user-shield"></i> Make Admin
                                         </button>
                                     </form>
                                 </div>
@@ -328,25 +308,76 @@
                         </tr>
                         {% endif %}
                         {% endfor %}
+                        
+                        <!-- Verified Non-Admin Users -->
+                        {% for user in users %}
+                        {% if not user.is_admin and user.verification_status == 'approved' %}
+                        <tr>
+                            <td style="padding: 1rem 1.25rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 35px; height: 35px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #10b981;">
+                                        {{ user.username[0]|upper }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">
+                                        <div style="font-weight: 600;">{{ user.username }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.college }}</td>
+                            <td>
+                                <div style="font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.2rem;">
+                                    <i class="fas fa-box" style="width: 14px; text-align: center; color: var(--primary);"></i> {{ user.listing_count }} Listings
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem;">
+                                    <i class="far fa-calendar-alt" style="width: 14px; text-align: center;"></i> {{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'Legacy' }}
+                                </div>
+                                {% if user.report_count > 0 %}
+                                <div style="font-size: 0.75rem; font-weight: 700; color: #ef4444; background: #fee2e2; display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px;">
+                                    <i class="fas fa-flag"></i> {{ user.report_count }} Reports
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge badge-approved">VERIFIED</span></td>
+                            <td>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                                    <form action="{{ url_for('send_admin_message') }}" method="POST" style="display: flex; gap: 0.5rem; margin: 0;" data-turbo="false">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="text" name="message" placeholder="Message..." required style="padding: 0.4rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.75rem; width: 130px;">
+                                        <button type="submit" class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Send</button>
+                                    </form>
+                                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Remove user?')" style="margin: 0;" data-turbo="false">
+                                        <button type="submit" style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                                            <i class="fas fa-ban"></i> Remove
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('promote_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Promote to Admin?')" style="margin: 0;" data-turbo="false">
+                                        <button type="submit" style="padding: 0.45rem 0.8rem; font-size: 0.75rem; background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                                            <i class="fas fa-user-shield"></i> Admin
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <!-- Product Listings -->
-        <section>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><i class="fas fa-boxes" style="color: #10b981; margin-right: 0.5rem;"></i> Active & Sold Listings
-                </h2>
-            </div>
-            <div
-                style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
+        <!-- ========================================== -->
+        <!-- TAB 3: LISTINGS -->
+        <!-- ========================================== -->
+        <div id="listings-section" class="admin-section">
+            <div style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
                 <table class="admin-table" style="width: 100%;">
                     <thead>
                         <tr>
                             <th style="padding: 1.25rem;">Item Details</th>
                             <th>Seller</th>
-                            <th>Price</th>
+                            <th>Stats</th>
                             <th>Current Status</th>
                             <th>Moderation</th>
                         </tr>
@@ -356,91 +387,326 @@
                         <tr>
                             <td style="padding: 1rem 1.25rem;">
                                 <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <img src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/50x50?text=No+Image' }}"
-                                        style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border);">
+                                    <img src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/50x50?text=No+Image' }}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border);">
                                     <div>
-                                        <div style="font-weight: 700;">{{ product.name }}</div>
-                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ product.category
-                                            }} | {{ product.college }}</div>
+                                        <div style="font-weight: 700;">
+                                            <a href="{{ url_for('product_detail', product_id=product.id) }}" target="_blank" style="color: var(--text-main); text-decoration: none;">{{ product.name }} <i class="fas fa-external-link-alt" style="font-size: 0.7rem; color: var(--text-muted); margin-left: 0.3rem;"></i></a>
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">{{ product.category }} | {{ product.college }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>{{ product.seller_name }}</td>
-                            <td style="font-weight: 800; color: var(--primary);">₹{{ product.price }}</td>
+                            <td>
+                                <div style="font-weight: 800; color: var(--primary); margin-bottom: 0.2rem;">₹{{ product.price }}</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">
+                                    <i class="far fa-clock"></i> {{ product.created_at.strftime('%Y-%m-%d') if product.created_at else 'Unknown' }}<br>
+                                    <i class="far fa-eye"></i> {{ product.views | default(0) }} Views
+                                </div>
+                            </td>
                             <td>
                                 {% if product.status == 'available' %}
-                                <span class="badge"
-                                    style="background: #dcfce7; color: #166534; font-weight: 800; border: 1px solid #bbf7d0;">AVAILABLE</span>
+                                <span class="badge" style="background: #dcfce7; color: #166534; font-weight: 800; border: 1px solid #bbf7d0;">AVAILABLE</span>
                                 {% else %}
-                                <span class="badge"
-                                    style="background: #fee2e2; color: #991b1b; font-weight: 800; border: 1px solid #fecaca;">SOLD
-                                    OUT</span>
+                                <span class="badge" style="background: #fee2e2; color: #991b1b; font-weight: 800; border: 1px solid #fecaca;">SOLD OUT</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('delete_product', product_id=product.id) }}"
-                                    onclick="return confirm('Moderator action: Delete this listing?')"
-                                    style="color: #ef4444; font-weight: 600; text-decoration: none;">Remove Item</a>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <form action="{{ url_for('admin_toggle_status', product_id=product.id) }}" method="POST" style="margin: 0;" data-turbo="false">
+                                        {% if product.status == 'available' %}
+                                        <button type="submit" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; border-radius: 8px; cursor: pointer; font-weight: 600;">Mark Sold</button>
+                                        {% else %}
+                                        <button type="submit" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; border-radius: 8px; cursor: pointer; font-weight: 600;">Mark Available</button>
+                                        {% endif %}
+                                    </form>
+                                    <form action="{{ url_for('delete_product', product_id=product.id) }}" method="GET" style="margin: 0;" data-turbo="false" onsubmit="return confirm('Moderator action: Delete this listing permanently?')">
+                                        <button type="submit" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">Remove</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: KYC APPROVALS -->
+        <!-- ========================================== -->
+        <div id="kyc-section" class="admin-section">
+            <div style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
+                {% set pending_kycs = kyc_requests | selectattr("status", "equalto", "pending") | list %}
+                {% if pending_kycs %}
+                <table class="admin-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1.25rem;">Student Info</th>
+                            <th>College & ID</th>
+                            <th>Document</th>
+                            <th>Submitted At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for k in pending_kycs %}
+                        <tr>
+                            <td style="padding: 1rem 1.25rem;">
+                                <div style="font-weight: 600;">{{ k.full_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">{{ k.user_email }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;"><i class="fas fa-phone-alt" style="font-size: 0.65rem;"></i> {{ k.phone }}</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.85rem;">{{ k.college_name }}</div>
+                                <div style="font-size: 0.75rem; color: #475569; margin-top: 0.1rem; font-weight: 600;">ID: {{ k.student_id }}</div>
+                            </td>
+                            <td>
+                                {% if k.doc_filename %}
+                                <a href="{{ url_for('kyc_doc', filename=k.doc_filename) }}" target="_blank" style="display: inline-block; padding: 0.3rem 0.6rem; background: #f1f5f9; color: var(--primary); border-radius: 6px; font-size: 0.75rem; text-decoration: none; font-weight: 600; border: 1px solid #cbd5e1;"><i class="fas fa-file-alt"></i> View Doc</a>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">No doc</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">
+                                    <i class="far fa-clock"></i> {{ k.submitted_at.strftime('%Y-%m-%d %H:%M') if k.submitted_at else 'Unknown' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <form action="{{ url_for('admin_kyc_action') }}" method="POST" style="display: inline;" data-turbo="false">
+                                        <input type="hidden" name="user_id" value="{{ k.id }}">
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn-primary" style="padding: 0.35rem 0.9rem; font-size: 0.78rem; background: #10b981; border-color: #10b981;" onclick="if(!this.dataset.clicked) { this.dataset.clicked=true; this.innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Approving...'; } else { return false; }"><i class="fas fa-check"></i> Approve</button>
+                                    </form>
+                                    <form action="{{ url_for('admin_kyc_action') }}" method="POST" style="display: inline;" data-turbo="false">
+                                        <input type="hidden" name="user_id" value="{{ k.id }}">
+                                        <input type="hidden" name="action" value="reject">
+                                        <input type="text" name="note" placeholder="Reason..." required style="padding: 0.3rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--border); border-radius: 6px; width: 100px;">
+                                        <button type="submit" style="padding: 0.35rem 0.9rem; font-size: 0.78rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;" onclick="return confirm('Reject this KYC?')"><i class="fas fa-times"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                    <i class="fas fa-check-double" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 0.8rem;"></i>
+                    No pending KYC requests!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: REPORTS -->
+        <!-- ========================================== -->
+        <div id="reports-section" class="admin-section">
+            <div style="background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
+                {% if reports %}
+                <table class="admin-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1.25rem;">Reported User</th>
+                            <th>Reported By</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reports %}
+                        <tr>
+                            <td style="padding: 1rem 1.25rem;">
+                                <div style="font-weight: 600; color: #ef4444;">{{ r.reported_name }}</div>
+                            </td>
+                            <td>{{ r.reporter_name }}</td>
+                            <td><span style="background: #fee2e2; color: #991b1b; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">{{ r.reason }}</span></td>
+                            <td style="font-size: 0.8rem; color: var(--text-muted);">{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else 'N/A' }}</td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <form action="{{ url_for('delete_user', user_id=r.reported_id) }}" method="POST" onsubmit="return confirm('Ban this user permanently?')" style="margin: 0;">
+                                        <button type="submit" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; cursor: pointer; font-weight: 700;">Ban User</button>
+                                    </form>
+                                    <form action="{{ url_for('delete_report', report_id=r.id) }}" method="POST" onsubmit="return confirm('Dismiss this report?')" style="margin: 0;">
+                                        <button type="submit" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-weight: 600;">Dismiss</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                    <i class="fas fa-shield-check" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 0.8rem;"></i>
+                    No pending user reports. Platform is clean!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 6: ADMIN INBOX -->
+        <!-- ========================================== -->
+        <div id="inbox-section" class="admin-section">
+            <div style="margin-bottom: 1.5rem;">
+                <p style="color: var(--text-muted); font-size: 0.95rem;">Your direct conversations with students (Support/Helpdesk).</p>
+            </div>
+            
+            {% if admin_inbox %}
+            <div style="display: grid; gap: 1rem;">
+                {% for conv in admin_inbox %}
+                <a href="{{ url_for('chat', product_id=conv.product_id or '0', receiver_id=conv.other_user_id) }}" target="_blank" style="text-decoration: none;">
+                    <div class="chat-bubble-admin" style="transition: all 0.2s; border-left: 4px solid var(--primary);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main);">
+                                {{ conv.other_username }}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                {{ conv.last_time.strftime('%Y-%m-%d %H:%M') if conv.last_time else '' }}
+                            </div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; background: #f8fafc; display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid #e2e8f0;">
+                            <strong>Context:</strong> {{ conv.product_name }}
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">
+                            <span style="color: var(--text-main); font-weight: 600;">Latest:</span> {{ conv.last_message }}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="padding: 3rem; text-align: center; color: var(--text-muted); background: white; border-radius: 24px; border: 1px solid var(--border);">
+                <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 0.8rem;"></i>
+                No direct messages to Admin yet.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 7: PLATFORM CHATS -->
+        <!-- ========================================== -->
+        <div id="chats-section" class="admin-section">
+            <div style="margin-bottom: 1.5rem;">
+                <p style="color: var(--text-muted); font-size: 0.95rem;">View latest conversations between users across the platform.</p>
+            </div>
+            
+            {% if all_conversations %}
+            <div style="display: grid; gap: 1rem;">
+                {% for conv in all_conversations %}
+                <div class="chat-bubble-admin">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">
+                            {{ conv.user1_name }} <i class="fas fa-arrows-alt-h" style="color: #cbd5e1; margin: 0 0.5rem;"></i> {{ conv.user2_name }}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">
+                            {{ conv.last_time.strftime('%Y-%m-%d %H:%M') if conv.last_time else 'Unknown Time' }}
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; background: #f8fafc; display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid #e2e8f0;">
+                        <strong>Product:</strong> {{ conv.product_name }}
+                    </div>
+                    
+                    <div style="background: #f1f5f9; padding: 0.8rem; border-radius: 8px; font-size: 0.9rem; color: var(--text-main); border-left: 3px solid var(--primary);">
+                        <span style="font-weight: 700; font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;">
+                            Last Message from: {{ conv.user1_name if conv.sender_id == conv.user1_id else conv.user2_name }}
+                        </span>
+                        {{ conv.last_message }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="padding: 3rem; text-align: center; color: var(--text-muted); background: white; border-radius: 24px; border: 1px solid var(--border);">
+                <i class="fas fa-comments" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 0.8rem;"></i>
+                No conversations on the platform yet.
+            </div>
+            {% endif %}
+        </div>
+
     </div>
 </div>
 
-<!-- Chart Scripts -->
+<!-- Scripts for Tabs and Charts -->
 <script>
+    // Tab Switching Logic
+    function switchTab(tabId, element) {
+        // Hide all sections
+        document.querySelectorAll('.admin-section').forEach(el => el.classList.remove('active'));
+        // Remove active class from all nav items
+        document.querySelectorAll('.admin-nav-item').forEach(el => el.classList.remove('active'));
+        
+        // Show target section
+        document.getElementById(tabId + '-section').classList.add('active');
+        // Add active class to clicked nav item
+        element.classList.add('active');
+        
+        // Update Title
+        const titles = {
+            'dashboard': 'Dashboard Overview',
+            'students': 'Student Management',
+            'listings': 'Active & Sold Listings',
+            'kyc': 'KYC Verification Requests',
+            'reports': 'User Reports',
+            'inbox': 'Admin Support Inbox',
+            'chats': 'Platform Chats'
+        };
+        document.getElementById('pageTitle').textContent = titles[tabId];
+    }
+
+    // Initialize Charts
     document.addEventListener('DOMContentLoaded', function () {
         // Inventory Chart (Bar)
         const ctxInv = document.getElementById('inventoryChart').getContext('2d');
         new Chart(ctxInv, {
             type: 'bar',
             data: {
-                labels: ['Students', 'Available', 'Sold'],
+                labels: ['Students', 'Active Products', 'Sold'],
                 datasets: [{
-                    label: '',
+                    label: 'Count',
                     data: [{{ stats.user_count }}, {{ stats.available_count }}, {{ stats.sold_count }}],
-        backgroundColor: ['#4f46e5', '#10b981', '#f43f5e'],
-        borderRadius: 8
+                    backgroundColor: ['#4f46e5', '#10b981', '#f43f5e'],
+                    borderRadius: 8
                 }]
             },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false }
-        },
-        scales: {
-            y: { beginAtZero: true, grid: { display: false } },
-            x: { grid: { display: false } }
-        }
-    }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
         });
 
-    // Category Chart (Doughnut)
-    const ctxCat = document.getElementById('categoryChart').getContext('2d');
-    new Chart(ctxCat, {
-        type: 'doughnut',
-        data: {
-            labels: {{ stats.cat_labels | tojson }},
-        datasets: [{
-            data: {{ stats.cat_counts | tojson }},
-        backgroundColor: ['#4f46e5', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
-        borderWidth: 0
-            }]
-        },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } }
-        },
-        cutout: '70%'
-    }
-    });
+        // Category Chart (Doughnut)
+        const ctxCat = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctxCat, {
+            type: 'doughnut',
+            data: {
+                labels: {{ stats.cat_labels | tojson }},
+                datasets: [{
+                    data: {{ stats.cat_counts | tojson }},
+                    backgroundColor: ['#4f46e5', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } }
+                },
+                cutout: '70%'
+            }
+        });
     });
 </script>
 {% endblock %}

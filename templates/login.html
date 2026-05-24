@@ -3,7 +3,11 @@
 {% block content %}
 <div class="auth-page">
     <div class="auth-container">
-        <h2 style="text-align: center; margin-bottom: 2rem;">Welcome Back</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <i class="fas fa-user-circle" style="font-size: 3rem; color: var(--primary); margin-bottom: 0.8rem;"></i>
+            <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">Welcome Back</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem;">Sign in to continue to CampusKart</p>
+        </div>
 
         <!-- Tab Switcher -->
         <div class="auth-tabs">
@@ -11,7 +15,7 @@
             <a href="{{ url_for('register') }}" class="auth-tab">Register</a>
         </div>
 
-        <form action="{{ url_for('login') }}" method="POST">
+        <form action="{{ url_for('login') }}" method="POST" data-turbo="false">
             <div class="form-group">
                 <label>Email Address</label>
                 <input type="email" name="email" required placeholder="yourname@college.edu">
@@ -33,7 +37,7 @@
         </form>
 
         <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
-            New here? <a href="{{ url_for('register') }}" style="color: var(--primary);">Create an account</a>
+            Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary);">Sign Up</a>
         </p>
     </div>
 </div>
@@ -41,38 +45,39 @@
 <style>
     .auth-tabs {
         display: flex;
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
         border: 1px solid var(--border);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.8rem;
+        padding: 4px;
+        background: #f8fafc;
     }
 
     .auth-tab {
         flex: 1;
         text-align: center;
-        padding: 0.65rem;
+        padding: 0.75rem;
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         color: var(--text-muted);
-        background: transparent;
-        transition: all 0.2s ease;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .auth-tab.active {
-        background: var(--primary);
-        color: #fff;
+        background: #fff;
+        color: var(--primary);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .auth-tab:hover:not(.active) {
-        background: #f1f5f9;
+        color: var(--text-main);
     }
 
     .forgot-link:hover {
         text-decoration: underline !important;
     }
-
-    .terms-group {
         margin: 0.4rem 0 1.1rem;
     }
 

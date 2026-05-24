@@ -1,48 +1,44 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container" style="max-width: 900px;">
-    <h1 style="font-size: 3rem; margin-bottom: 2rem;">Terms of Service</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Last Updated: February 26, 2026</p>
+<div style="max-width: 800px; margin: 4rem auto; padding: 2.5rem; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+        <div style="width: 70px; height: 70px; background: rgba(249, 115, 22, 0.1); color: #f97316; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1.2rem;">
+            <i class="fas fa-file-contract"></i>
+        </div>
+        <h1 style="color: var(--text-main); font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem;">Terms of Service</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">The rules and agreements for using CampusKart.</p>
+    </div>
 
-    <div style="line-height: 1.8; color: var(--text-main);">
-        <section style="margin-bottom: 2rem;">
-            <h2>1. Acceptance of Terms</h2>
-            <p>By using CampusKart, you agree to these Terms of Service. If you do not agree to these terms, please do
-                not use our service. We reserve the right to modify these terms at any time.</p>
-        </section>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid #f97316; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;">1. Acceptance of Terms</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">By using CampusKart, you agree to these Terms of Service. If you do not agree to these terms, please do not use our service. We reserve the right to modify these terms at any time.</p>
+        </div>
+        
+        <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid #f97316; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;">2. User Content & Conduct</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">You are solely responsible for all images, text, and other content you post. You must not post anything illegal, offensive, or infringing on intellectual property. We reserve the right to remove any violating content.</p>
+        </div>
 
-        <section style="margin-bottom: 2rem;">
-            <h2>2. User Content & Conduct</h2>
-            <p>You are solely responsible for all images, text, and other content you post on CampusKart. You must not
-                post anything illegal, offensive, or infringing on intellectual property. We reserve the right to remove
-                any content that violates these policies.</p>
-        </section>
+        <div id="safety" style="padding: 1.5rem; background: #fff1f2; border-radius: 12px; border-left: 4px solid #ef4444; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: #be123c; font-size: 1.15rem; margin-bottom: 0.5rem;">3. Liability Disclaimer & Safe Trading</h3>
+            <p style="color: #9f1239; font-size: 0.95rem; line-height: 1.6; margin: 0;"><strong>CampusKart is strictly a peer-to-peer platform.</strong> We do not process payments, verify the quality of items, or participate in physical transactions. By using this platform, you explicitly agree that CampusKart administrators are <strong>not legally or financially liable</strong> for any monetary losses, scams, disputes, or physical harm arising from meetups. You trade entirely at your own risk.</p>
+        </div>
 
-        <section style="margin-bottom: 2rem;">
-            <h2>3. Safe Trading</h2>
-            <p>CampusKart is a platform for students to connect. We do not handle payments or shipping. We strongly
-                recommend meeting in visible campus locations for transactions. We are not responsible for any disputes
-                that arise between users.</p>
-        </section>
+        <div id="rules" style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid #f97316; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;">4. Account Suspension</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">We may suspend or terminate your account if you violate these terms, engage in fraudulent activity, sell stolen property, or mislead buyers.</p>
+        </div>
 
-        <section style="margin-bottom: 2rem;">
-            <h2>4. Termination of Accounts</h2>
-            <p>We may suspend or terminate your account if you violate these terms or engage in fraudulent activity.
-                This includes selling stolen property or misleading buyers about item condition.</p>
-        </section>
-
-        <section style="margin-bottom: 2rem;">
-            <h2>5. Disclaimer of Warranties</h2>
-            <p>CampusKart is provided "as is" and "as available" without any warranties. We are not liable for any
-                damages resulting from your use of the platform.</p>
-        </section>
-
-        <section style="margin-bottom: 2rem;">
-            <h2>6. Contact Us</h2>
-            <p>For any inquiries regarding these Terms of Service, please contact us at <a
-                    href="mailto:campuskart@gmail.com">campuskart@gmail.com</a>.</p>
-        </section>
+        <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid #f97316; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;">5. Indemnification</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">CampusKart is provided "as is". By using the platform, you agree to indemnify and hold harmless the creators from any claims, lawsuits, or demands arising out of your use of the platform.</p>
+        </div>
+    </div>
+    
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="{{ url_for('index') }}" class="btn-primary" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 50px; text-decoration: none; font-weight: 600; background: linear-gradient(135deg, #f97316, #ea580c); border-color: #ea580c;">Back to Home</a>
     </div>
 </div>
 {% endblock %}

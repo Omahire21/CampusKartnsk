@@ -3,7 +3,11 @@
 {% block content %}
 <div class="auth-page">
     <div class="auth-container">
-        <h2 style="text-align: center; margin-bottom: 2rem;">Join the Community</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--primary); margin-bottom: 0.8rem;"></i>
+            <h2 style="margin: 0; font-size: 1.8rem; color: var(--text-main);">Join the Community</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem;">Create a new CampusKart account</p>
+        </div>
 
         <!-- Tab Switcher -->
         <div class="auth-tabs">
@@ -11,7 +15,7 @@
             <a href="{{ url_for('register') }}" class="auth-tab active">Register</a>
         </div>
 
-        <form action="{{ url_for('register') }}" method="POST" id="registerForm">
+        <form action="{{ url_for('register') }}" method="POST" id="registerForm" data-turbo="false">
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" name="username" required placeholder="Mohit Ahire">
@@ -20,11 +24,19 @@
                 <label>Email Address (College or Personal)</label>
                 <input type="email" name="email" required placeholder="mohit@college.edu or personal@gmail.com">
             </div>
+
+            <div class="form-group" style="position: relative;">
+                <label>Email Verification OTP</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" name="otp" id="otpInput" required placeholder="123456" maxlength="6" style="flex: 1; letter-spacing: 2px;">
+                    <button type="button" id="sendOtpBtn" onclick="requestOtp()" style="padding: 0 1rem; border-radius: 8px; border: 1px solid var(--primary); background: white; color: var(--primary); font-weight: 600; cursor: pointer; transition: all 0.2s;">Send OTP</button>
+                </div>
+                <div id="otpStatusMsg" style="font-size: 0.82rem; margin-top: 0.5rem; display: none;"></div>
+            </div>
             <div class="form-group" style="position: relative;">
                 <label>College Name (Nashik)</label>
-                <input type="text" id="collegeSearch" placeholder="Type to search your college..." autocomplete="off"
+                <input type="text" name="college" id="collegeSearch" required placeholder="Type to search your college..." autocomplete="off"
                     style="width: 100%; padding: 0.8rem; border-radius: 10px; border: 1px solid var(--border); background: #f8fafc;">
-                <input type="hidden" name="college" id="collegeValue" required>
 
                 <div id="collegeDropdown" class="custom-dropdown"
                     style="display: none; position: absolute; width: 100%; max-height: 250px; overflow-y: auto; background: white; border: 1px solid var(--border); border-radius: 10px; z-index: 1000; box-shadow: var(--shadow-md); margin-top: 5px;">
@@ -79,31 +91,34 @@
 <style>
     .auth-tabs {
         display: flex;
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
         border: 1px solid var(--border);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.8rem;
+        padding: 4px;
+        background: #f8fafc;
     }
 
     .auth-tab {
         flex: 1;
         text-align: center;
-        padding: 0.65rem;
+        padding: 0.75rem;
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         color: var(--text-muted);
-        background: transparent;
-        transition: all 0.2s ease;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .auth-tab.active {
-        background: var(--primary);
-        color: #fff;
+        background: #fff;
+        color: var(--primary);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .auth-tab:hover:not(.active) {
-        background: #f1f5f9;
+        color: var(--text-main);
     }
 
     .dropdown-item:hover {
@@ -137,10 +152,11 @@
     /* ---------- College dropdown ---------- */
     const searchInput = document.getElementById('collegeSearch');
     const dropdown = document.getElementById('collegeDropdown');
-    const hiddenInput = document.getElementById('collegeValue');
     const items = dropdown.getElementsByClassName('dropdown-item');
 
-    searchInput.addEventListener('focus', () => { dropdown.style.display = 'block'; });
+    // Show dropdown and refresh filter on both focus and click
+    searchInput.addEventListener('focus', () => { searchInput.dispatchEvent(new Event('input')); });
+    searchInput.addEventListener('click', () => { searchInput.dispatchEvent(new Event('input')); });
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
             dropdown.style.display = 'none';
@@ -159,7 +175,6 @@
     for (let i = 0; i < items.length; i++) {
         items[i].addEventListener('click', function () {
             searchInput.value = this.getAttribute('data-value');
-            hiddenInput.value = this.getAttribute('data-value');
             dropdown.style.display = 'none';
         });
     }
@@ -200,5 +215,62 @@
             cfField.focus();
         }
     });
+
+    async function requestOtp() {
+        const emailInput = document.querySelector('input[name="email"]');
+        const email = emailInput.value.trim();
+        const msgDiv = document.getElementById('otpStatusMsg');
+        const btn = document.getElementById('sendOtpBtn');
+
+        if (!email) {
+            msgDiv.style.display = 'block';
+            msgDiv.style.color = '#ef4444';
+            msgDiv.textContent = 'Please enter your email first.';
+            emailInput.focus();
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        msgDiv.style.display = 'none';
+
+        try {
+            const res = await fetch("{{ url_for('send_otp') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, purpose: 'register' })
+            });
+            const data = await res.json();
+
+            msgDiv.style.display = 'block';
+            if (data.status === 'success') {
+                msgDiv.style.color = '#10b981';
+                msgDiv.textContent = data.message;
+                
+                // Cooldown timer
+                let timeLeft = 60;
+                const timer = setInterval(() => {
+                    btn.textContent = `Resend (${timeLeft}s)`;
+                    timeLeft--;
+                    if (timeLeft < 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.textContent = 'Send OTP';
+                    }
+                }, 1000);
+            } else {
+                msgDiv.style.color = '#ef4444';
+                msgDiv.textContent = data.message;
+                btn.disabled = false;
+                btn.textContent = 'Send OTP';
+            }
+        } catch (err) {
+            msgDiv.style.display = 'block';
+            msgDiv.style.color = '#ef4444';
+            msgDiv.textContent = 'Network error. Please try again.';
+            btn.disabled = false;
+            btn.textContent = 'Send OTP';
+        }
+    }
 </script>
 {% endblock %}

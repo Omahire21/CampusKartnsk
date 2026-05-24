@@ -1,94 +1,265 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <div
-        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+<div class="container" style="max-width: 1440px; margin: 0 auto; padding: 2rem 5% 5rem;">
+    <!-- Shop Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1.5rem;">
         <div>
-            <h1>Explore Items</h1>
-            <p style="color: var(--text-muted);">Showing products from <strong>{{ current_college if current_college
-                    else 'All Colleges' }}</strong></p>
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">Explore Campus Marketplace</h1>
+            <p style="color: var(--text-muted); font-weight: 500;">
+                Showing products from <strong>{{ current_college.split('(')[0].strip() if current_college else 'All Nashik Colleges' }}</strong>
+            </p>
         </div>
 
-        <form action="{{ url_for('products') }}" method="GET" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <div class="form-group" style="margin: 0; min-width: 200px;">
-                <input type="text" name="search" placeholder="Search products..."
-                    value="{{ request.args.get('search', '') }}">
+        <!-- Glassmorphism Filter & Search Form -->
+        <form action="{{ url_for('products') }}" method="GET" style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center;">
+            <div class="form-group" style="margin: 0; min-width: 280px; position: relative;" id="searchWrapper">
+                <!-- Inline SVG magnifier - always renders -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                     style="position: absolute; left: 1rem; top: 14px; pointer-events: none; z-index: 2;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" name="search" id="liveSearchInput"
+                       placeholder="Search textbooks, calculators..."
+                       value="{{ request.args.get('search', '') }}"
+                       autocomplete="off"
+                       style="padding-left: 2.6rem; background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 500; height: 42px; width: 100%;"
+                       onfocus="this.style.borderColor='var(--primary)';this.style.boxShadow='0 0 0 3px rgba(108,76,241,0.08)'"
+                       onblur="setTimeout(()=>{this.style.borderColor='var(--border)';this.style.boxShadow='none';}, 200)">
+                <!-- Live search dropdown -->
+                <div id="searchDropdown" style="display:none; position: absolute; top: 48px; left: 0; right: 0; background: white; border: 1.5px solid var(--border); border-radius: 16px; box-shadow: 0 12px 32px rgba(108,76,241,0.12); z-index: 100; overflow: hidden; max-height: 400px; overflow-y: auto;"></div>
             </div>
-            <div class="form-group" style="margin: 0;">
-                <select name="category" onchange="this.form.submit()">
+            
+            <div class="form-group" style="margin: 0; min-width: 160px;">
+                <select name="category" onchange="this.form.submit()" 
+                        style="background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 600; height: 42px; padding: 0 1rem;">
                     <option value="">All Categories</option>
-                    <option value="Books" {% if request.args.get('category')=='Books' %}selected{% endif %}>Books
-                    </option>
-                    <option value="Electronics" {% if request.args.get('category')=='Electronics' %}selected{% endif %}>
-                        Electronics</option>
-                    <option value="Calculators" {% if request.args.get('category')=='Calculators' %}selected{% endif %}>
-                        Calculators</option>
-                    <option value="Shoes" {% if request.args.get('category')=='Shoes' %}selected{% endif %}>Shoes
-                    </option>
-                    <option value="Dorm Essentials" {% if request.args.get('category')=='Dorm Essentials' %}selected{%
-                        endif %}>Dorm Essentials</option>
+                    <option value="Books" {% if request.args.get('category')=='Books' %}selected{% endif %}>Books</option>
+                    <option value="Electronics" {% if request.args.get('category')=='Electronics' %}selected{% endif %}>Electronics</option>
+                    <option value="Calculators" {% if request.args.get('category')=='Calculators' %}selected{% endif %}>Calculators</option>
+                    <option value="Stationery" {% if request.args.get('category')=='Stationery' %}selected{% endif %}>Stationery/Lab Kits</option>
+                    <option value="Hostel" {% if request.args.get('category')=='Hostel' %}selected{% endif %}>Hostel Essentials</option>
                 </select>
             </div>
-            <div class="form-group" style="margin: 0;">
-                <select name="college" onchange="this.form.submit()">
+
+            <div class="form-group" style="margin: 0; min-width: 200px; max-width: 250px;">
+                <select name="college" onchange="this.form.submit()"
+                        style="background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 600; height: 42px; padding: 0 1rem; width: 100%;">
                     <option value="">All Colleges</option>
                     {% for college in colleges %}
-                    <option value="{{ college }}" {% if current_college==college %}selected{% endif %}>{{ college }}
+                    <option value="{{ college }}" {% if current_college==college %}selected{% endif %}>
+                        {{ college.split('(')[0].strip() }}
                     </option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Filter</button>
-            <a href="{{ url_for('products') }}" class="btn-primary"
-                style="background: white; color: var(--text-main); border: 1px solid var(--border); box-shadow: none;">Clear</a>
+
+            <button type="submit" class="btn-primary" style="height: 42px; display: flex; align-items: center; justify-content: center; padding: 0 1.5rem; border-radius: 12px;">
+                Filter
+            </button>
+            <a href="{{ url_for('products') }}" class="btn-secondary"
+               style="height: 42px; display: flex; align-items: center; justify-content: center; padding: 0 1.2rem; border-radius: 12px; background: white; border: 1.5px solid var(--border); text-decoration: none; color: var(--text-main); font-weight: 600; box-shadow: none;">
+                Clear
+            </a>
         </form>
     </div>
 
+    <!-- Product Grid -->
     {% if products %}
     <div class="product-grid">
         {% for product in products %}
         <div class="product-card">
-            <div style="position: relative;">
-                <img src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/300x200?text=No+Image' }}"
-                    alt="{{ product.name }}" class="product-image" style="filter: contrast(0.9) brightness(0.95);">
-                <span
-                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; backdrop-filter: blur(5px);">PRE-OWNED</span>
+            <!-- Image Section -->
+            <div class="product-image-wrapper">
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" style="display: block; width: 100%; height: 100%;">
+                    <img src="{{ product.first_image if product.is_external else url_for('uploaded_file', filename=product.first_image) if product.first_image else 'https://via.placeholder.com/300x240?text=No+Image' }}"
+                         alt="{{ product.name }}" class="product-image">
+                </a>
+                
+                <!-- Wishlist Button -->
                 {% if session.get('user_id') %}
-                <form action="{{ url_for('toggle_favorite', product_id=product.id) }}" method="POST"
-                    onsubmit="handleFavorite(event, {{ product.id }})"
-                    style="position: absolute; top: 40px; right: 10px; margin: 0; z-index: 10;">
-                    <button type="submit"
-                        style="background: white; border: none; width: 35px; height: 35px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                            fill="{{ '#ef4444' if product.id in favorite_ids else 'none' }}" stroke="#ef4444"
-                            stroke-width="2">
-                            <path
-                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                            </path>
+                <div style="margin: 0;">
+                    <button type="button" onclick="handleFavorite(event, '{{ product.id }}')" data-url="{{ url_for('toggle_favorite', product_id=product.id) }}" class="wishlist-btn-modern" title="Add to Favorites"
+                            style="background: rgba(255,255,255,0.95); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.12); position: absolute; top: 12px; right: 12px; z-index: 5; transition: transform 0.2s;"
+                            onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="{% if product.id in favorite_ids %}#ef4444{% else %}none{% endif %}"
+                             stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                         </svg>
                     </button>
-                </form>
-                {% endif %}
-            </div>
-            <div class="product-info">
-                <h3>{{ product.name }}</h3>
-                <p class="product-price">₹{{ product.price }}</p>
-                <div class="product-meta">
-                    <span><i class="fas fa-university"></i> {{ product.college }}</span>
-                    <span><i class="fas fa-tag"></i> {{ product.category }}</span>
                 </div>
-                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn-view">Details</a>
+                {% endif %}
+                
+                <!-- Condition Badge -->
+                <div class="card-badge-container">
+                    <span class="condition-tag {% if product.usage_info == 'Used - Like New' %}like_new{% elif product.usage_info == 'Used - Good' %}good{% elif product.usage_info == 'Used - Fair' %}fair{% else %}new{% endif %}">
+                        {{ product.usage_info or 'Used' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="product-info-modern">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; height: 2.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                    {{ product.name }}
+                </h4>
+                
+                <div class="product-college-meta">
+                    <i class="fas fa-university"></i>
+                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                        {{ product.college.split('(')[0].strip() }}
+                    </span>
+                </div>
+
+                <div class="card-footer-modern">
+                    <div class="card-price-modern">₹{{ product.price }}</div>
+                    {% if session.get('user_id') %}
+                        {% if product.seller_id != session['user_id'] %}
+                        <a href="{{ url_for('chat', product_id=product.id, receiver_id=product.seller_id) }}" class="card-chat-btn" title="Chat with Seller">
+                            <img src="{{ url_for('static', filename='chat-box.png') }}" width="16" height="16" style="filter: brightness(0) invert(1);">
+                        </a>
+                        {% else %}
+                        <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">My Listing</span>
+                        {% endif %}
+                    {% else %}
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}" class="card-chat-btn" title="View details">
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div style="text-align: center; padding: 5rem; background: var(--glass); border-radius: 20px;">
-        <i class="fas fa-search" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
-        <h3>No products found</h3>
-        <p style="color: var(--text-muted);">Try adjusting your search or filters.</p>
+    <div style="text-align: center; padding: 6rem 2rem; background: white; border: 1.5px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-sm); max-width: 600px; margin: 3rem auto;">
+        <div style="width: 70px; height: 70px; background: rgba(108, 76, 241, 0.06); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary); font-size: 2rem;">
+            <i class="fas fa-search-minus"></i>
+        </div>
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">No products found</h3>
+        <p style="color: var(--text-muted); font-weight: 500; margin-bottom: 1.5rem;">We couldn't find any products matching your search criteria or filters.</p>
+        <a href="{{ url_for('products') }}" class="btn-primary">
+            Reset Filters
+        </a>
     </div>
     {% endif %}
 </div>
+
+<script>
+// ── Live Search Autocomplete ───────────────────────────────────────────────
+(function() {
+    const input    = document.getElementById('liveSearchInput');
+    const dropdown = document.getElementById('searchDropdown');
+    if (!input || !dropdown) return;
+
+    let debounceTimer;
+    let activeIndex = -1;
+
+    const NO_IMAGE = 'https://via.placeholder.com/56x56?text=📦';
+
+    function renderDropdown(items) {
+        dropdown.innerHTML = '';
+        if (!items.length) {
+            dropdown.innerHTML = `
+                <div style="padding: 1.2rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+                    🔍 No products found
+                </div>`;
+            dropdown.style.display = 'block';
+            return;
+        }
+
+        items.forEach((item, idx) => {
+            const imgSrc = item.image || NO_IMAGE;
+            const college = item.college ? item.college.split('(')[0].trim() : '';
+            const price   = parseFloat(item.price).toLocaleString('en-IN');
+            const url     = `/product/${item.id}`;
+
+            const row = document.createElement('a');
+            row.href  = url;
+            row.dataset.idx = idx;
+            row.style.cssText = `
+                display: flex; align-items: center; gap: 0.9rem;
+                padding: 0.75rem 1rem;
+                text-decoration: none;
+                border-bottom: 1px solid var(--border);
+                transition: background 0.15s ease;
+                cursor: pointer;
+                background: white;
+            `;
+            row.innerHTML = `
+                <img src="${imgSrc}" alt="" 
+                     style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border);"
+                     onerror="this.src='${NO_IMAGE}'">
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</div>
+                    ${college ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🏫 ${college}</div>` : ''}
+                </div>
+                <div style="font-weight: 800; font-size: 0.95rem; color: var(--primary); flex-shrink: 0;">₹${price}</div>
+            `;
+            row.addEventListener('mouseenter', () => {
+                row.style.background = 'rgba(108,76,241,0.04)';
+                activeIndex = idx;
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.background = 'white';
+            });
+            dropdown.appendChild(row);
+        });
+
+        // "View all results" footer
+        const footer = document.createElement('div');
+        footer.style.cssText = 'padding: 0.7rem 1rem; text-align: center; border-top: 1px solid var(--border);';
+        footer.innerHTML = `<a href="/products?search=${encodeURIComponent(input.value)}" style="font-size: 0.82rem; font-weight: 700; color: var(--primary); text-decoration: none;">View all results →</a>`;
+        dropdown.appendChild(footer);
+        dropdown.style.display = 'block';
+    }
+
+    function closeDropdown() {
+        dropdown.style.display = 'none';
+        activeIndex = -1;
+    }
+
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const q = this.value.trim();
+        if (q.length < 2) { closeDropdown(); return; }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`/api/search?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(data => renderDropdown(data))
+                .catch(() => closeDropdown());
+        }, 280);
+    });
+
+    // Keyboard navigation
+    input.addEventListener('keydown', function(e) {
+        const rows = dropdown.querySelectorAll('a[data-idx]');
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIndex = Math.min(activeIndex + 1, rows.length - 1);
+            rows.forEach((r, i) => r.style.background = i === activeIndex ? 'rgba(108,76,241,0.06)' : 'white');
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIndex = Math.max(activeIndex - 1, -1);
+            rows.forEach((r, i) => r.style.background = i === activeIndex ? 'rgba(108,76,241,0.06)' : 'white');
+        } else if (e.key === 'Enter' && activeIndex >= 0 && rows[activeIndex]) {
+            e.preventDefault();
+            rows[activeIndex].click();
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('searchWrapper').contains(e.target)) {
+            closeDropdown();
+        }
+    });
+})();
+</script>
 {% endblock %}

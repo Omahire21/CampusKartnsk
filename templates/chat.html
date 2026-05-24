@@ -1,51 +1,214 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    {% if product_id == 0 %}
-    <a href="{{ url_for('my_chats') }}" style="color: var(--text-muted); display: inline-block; margin-bottom: 2rem;">
-        <i class="fas fa-arrow-left"></i> Back to Chats
-    </a>
-    {% else %}
-    <a href="{{ url_for('product_detail', product_id=product_id) }}"
-        style="color: var(--text-muted); display: inline-block; margin-bottom: 2rem;">
-        <i class="fas fa-arrow-left"></i> Back to Product
-    </a>
-    {% endif %}
+<div style="max-width: 860px; margin: 0 auto; padding: 1.5rem 1.5rem 2rem;">
 
-    <div class="chat-container">
-        <div class="chat-header">
-            <h3>Chatting with {{ receiver.username }}</h3>
+    <!-- Back Button -->
+    <div style="margin-bottom: 1.2rem;">
+        {% if product_id == '0' or product_id == 0 %}
+        <a href="{{ url_for('my_chats') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.88rem; padding: 0.45rem 1rem; background: white; border: 1.5px solid var(--border); border-radius: 50px; transition: all 0.2s;"
+           onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"></polyline></svg>
+            Back to Chats
+        </a>
+        {% else %}
+        <a href="{{ url_for('product_detail', product_id=product_id) }}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.88rem; padding: 0.45rem 1rem; background: white; border: 1.5px solid var(--border); border-radius: 50px; transition: all 0.2s;"
+           onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"></polyline></svg>
+            Back to Product
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Chat Window -->
+    <div style="background: white; border: 1.5px solid var(--border); border-radius: 28px; overflow: hidden; box-shadow: 0 8px 32px rgba(108,76,241,0.08);">
+
+        <!-- Chat Header -->
+        <div style="background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%); padding: 1.2rem 1.8rem; display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: white; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.4);">
+                {{ receiver.username[0]|upper if receiver.username else '?' }}
+            </div>
+            <div style="flex: 1;">
+                <div style="font-size: 1rem; font-weight: 800; color: white;">{{ receiver.username }}</div>
+                <div id="presenceSubtitle" style="font-size: 0.78rem; color: rgba(255,255,255,0.75); margin-top: 2px; display: flex; align-items: center; gap: 0.4rem; transition: all 0.4s;">
+                    <span id="presenceDot" style="width: 7px; height: 7px; background: rgba(255,255,255,0.3); border-radius: 50%; display: inline-block; flex-shrink: 0; transition: all 0.4s;"></span>
+                    <span id="presenceText">Connecting...</span>
+                </div>
+            </div>
+            {% if product and product.name and product_id != '0' and product_id != 0 %}
+            <a href="{{ url_for('product_detail', product_id=product_id) }}"
+               style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); padding: 0.4rem 0.9rem; border-radius: 50px; text-decoration: none; color: white; font-size: 0.78rem; font-weight: 700; transition: all 0.2s;"
+               onmouseover="this.style.background='rgba(255,255,255,0.28)'"
+               onmouseout="this.style.background='rgba(255,255,255,0.18)'">
+                <img src="{{ url_for('static', filename='chat-box.png') }}" width="14" height="14" style="vertical-align: middle; filter: brightness(0) invert(1);"> {{ product.name[:20] }}{% if product.name|length > 20 %}…{% endif %}
+            </a>
+            {% endif %}
         </div>
 
-        <div class="chat-messages" id="chatMessages">
+        <!-- Messages Area -->
+        <div id="chatMessages" style="min-height: 400px; max-height: 500px; overflow-y: auto; padding: 1.5rem 1.8rem; background: #f6f5fb; display: flex; flex-direction: column; gap: 0.6rem; scroll-behavior: smooth;">
+
+            <!-- Date separator -->
+            <div style="text-align: center; margin: 0.5rem 0;">
+                <span style="background: rgba(108,76,241,0.08); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.9rem; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.5px;">Today</span>
+            </div>
+
             {% if messages %}
             {% for msg in messages %}
-            <div class="message {% if msg.sender_id == session['user_id'] %}sent{% else %}received{% endif %}">
-                <p>{{ msg.message }}</p>
-                <span style="font-size: 0.6rem; opacity: 0.7; display: block; margin-top: 0.3rem;">
-                    {{ msg.timestamp.strftime('%H:%M') }}
-                </span>
+            {% set is_mine = msg.sender_id == my_id %}
+            <div style="display: flex; justify-content: {% if is_mine %}flex-end{% else %}flex-start{% endif %}; align-items: flex-end; gap: 0.4rem;">
+
+                {% if not is_mine %}
+                <!-- Receiver avatar dot -->
+                <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #6C4CF1, #8B5CF6); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: white; flex-shrink: 0; margin-bottom: 2px;">
+                    {{ receiver.username[0]|upper if receiver.username else '?' }}
+                </div>
+                {% endif %}
+
+                <div style="max-width: 68%;
+                    {% if is_mine %}
+                    background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%);
+                    color: white;
+                    border-radius: 18px 18px 4px 18px;
+                    box-shadow: 0 3px 10px rgba(108,76,241,0.22);
+                    {% else %}
+                    background: white;
+                    color: var(--text-main);
+                    border-radius: 18px 18px 18px 4px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                    border: 1px solid var(--border);
+                    {% endif %}
+                    padding: 0.65rem 1rem;">
+
+                    <div style="font-size: 0.68rem; font-weight: 700; opacity: 0.85; margin-bottom: 0.3rem; text-align: left;">
+                        {% if is_mine %}You{% else %}{{ receiver.username }}{% endif %}
+                    </div>
+                    <p style="font-size: 0.91rem; line-height: 1.5; margin: 0; word-break: break-word;">{{ msg.message | replace('[ADMIN]: ', '') }}</p>
+
+                    <!-- Timestamp + Tick row -->
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-top: 0.35rem;">
+                        <span style="font-size: 0.62rem; {% if is_mine %}color: rgba(255,255,255,0.65);{% else %}color: var(--text-muted);{% endif %}">
+                            {% if msg.timestamp %}
+                                {% if msg.timestamp.strftime is defined %}{{ msg.timestamp.strftime('%H:%M') }}{% else %}{{ msg.timestamp }}{% endif %}
+                            {% endif %}
+                        </span>
+
+                        {% if is_mine %}
+                        <!-- WhatsApp-style ticks -->
+                        {% if msg.read_at %}
+                        <!-- Double blue tick = READ -->
+                        <svg width="16" height="10" viewBox="0 0 16 10" fill="none" title="Read">
+                            <path d="M1 5l3 3 5-6" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 5l3 3 6-7" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% else %}
+                        <!-- Double grey tick = DELIVERED/SENT -->
+                        <svg width="16" height="10" viewBox="0 0 16 10" fill="none" title="Delivered">
+                            <path d="M1 5l3 3 5-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 5l3 3 6-7" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             {% endfor %}
+
             {% else %}
-            <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                No messages yet. Say hello!
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 1rem; text-align: center; gap: 1rem;">
+                <img src="{{ url_for('static', filename='chat-box.png') }}" width="50" height="50" style="opacity: 0.8;">
+                <div>
+                    <div style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 0.3rem;">No messages yet</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Say hello to {{ receiver.username }}!</div>
+                </div>
             </div>
             {% endif %}
         </div>
 
-        <form class="chat-input" action="{{ url_for('chat', product_id=product_id, receiver_id=receiver_id) }}"
-            method="POST">
-            <input type="text" name="message" placeholder="Type a message..." required autocomplete="off">
-            <button type="submit" class="btn-primary">Send</button>
+        <!-- Message Input -->
+        <form action="{{ url_for('chat', product_id=product_id, receiver_id=receiver_id) }}" method="POST"
+              style="padding: 1rem 1.4rem; border-top: 1.5px solid var(--border); background: white; display: flex; gap: 0.7rem; align-items: center;">
+
+            <input type="text" name="message" id="messageInput"
+                   placeholder="Type a message..."
+                   required autocomplete="off"
+                   style="flex: 1; border: 1.5px solid var(--border); border-radius: 50px; padding: 0.75rem 1.3rem; font-size: 0.92rem; font-family: inherit; font-weight: 500; outline: none; background: #f6f5fb; transition: all 0.2s; color: var(--text-main);"
+                   onfocus="this.style.borderColor='var(--primary)';this.style.background='white';this.style.boxShadow='0 0 0 3px rgba(108,76,241,0.08)'"
+                   onblur="this.style.borderColor='var(--border)';this.style.background='#f6f5fb';this.style.boxShadow='none'">
+
+            <!-- Telegram-style Send Button -->
+            <button type="submit" id="sendBtn"
+                    style="background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%); color: white; border: none; border-radius: 50%; width: 46px; height: 46px; min-width: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 14px rgba(108,76,241,0.35); transition: all 0.2s; position: relative; overflow: hidden;"
+                    onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 20px rgba(108,76,241,0.5)'"
+                    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 14px rgba(108,76,241,0.35)'"
+                    title="Send">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
+                     fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send">
+                    <path d="m22 2-7 20-4-9-9-4Z"></path>
+                    <path d="M22 2 11 13"></path>
+                </svg>
+            </button>
         </form>
+    </div>
+
+    <!-- Safety Tips -->
+    <div style="margin-top: 1.2rem; display: flex; gap: 0.6rem; justify-content: space-between; width: 100%;">
+        <span style="flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; background: white; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">💡 Agree on price before meeting</span>
+        <span style="flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; background: white; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🛡️ Meet in campus public areas only</span>
+        <span style="flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-muted); font-weight: 600; background: white; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">✅ Verify item before paying</span>
     </div>
 </div>
 
 <script>
     // Scroll to bottom
     const chatBox = document.getElementById('chatMessages');
-    chatBox.scrollTop = chatBox.scrollHeight;
+    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Enter to send
+    const msgInput = document.getElementById('messageInput');
+    if (msgInput) {
+        msgInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.closest('form').submit();
+            }
+        });
+    }
+
+    // ── Presence System ─────────────────────────────────────────────────────
+    const receiverId = "{{ receiver_id | safe }}";
+    const dot  = document.getElementById('presenceDot');
+    const text = document.getElementById('presenceText');
+
+    function pingPresence() {
+        fetch('/api/presence/ping', { method: 'POST' }).catch(() => {});
+    }
+
+    function checkPresence() {
+        fetch('/api/presence/' + encodeURIComponent(receiverId))
+            .then(r => r.json())
+            .then(data => {
+                if (!dot || !text) return;
+                if (data.online) {
+                    dot.style.background = '#4ade80';
+                    dot.style.boxShadow  = '0 0 0 2px rgba(74,222,128,0.35)';
+                    text.textContent     = 'Online';
+                    text.style.color     = 'rgba(255,255,255,0.95)';
+                } else {
+                    dot.style.background = 'rgba(255,255,255,0.3)';
+                    dot.style.boxShadow  = 'none';
+                    text.textContent     = data.last_seen ? 'Last seen ' + data.last_seen.slice(11,16) : 'Offline';
+                    text.style.color     = 'rgba(255,255,255,0.6)';
+                }
+            })
+            .catch(() => { if(text) text.textContent = 'Offline'; });
+    }
+
+    pingPresence();
+    setInterval(pingPresence, 30000);
+    checkPresence();
+    setInterval(checkPresence, 15000);
 </script>
 {% endblock %}

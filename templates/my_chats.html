@@ -10,7 +10,7 @@
     <div
         style="background: white; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm);">
         {% for c in conversations %}
-        <a href="{{ url_for('chat', product_id=c.product_id, receiver_id=c.other_user_id) }}"
+        <a href="{{ url_for('chat', product_id=(c.product_id or '0'), receiver_id=c.other_user_id) }}"
             style="display: flex; align-items: center; gap: 1.2rem; padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s;">
             <div
                 style="width: 46px; height: 46px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0;">

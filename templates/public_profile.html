@@ -136,11 +136,11 @@
         </div>
 
         <div style="position: absolute; right: 1.5rem; top: 1.5rem; display: flex; gap: 0.5rem;">
-            <button class="btn-outline-sm"
-                style="padding: 0.4rem 0.6rem; border-color: var(--border); color: #64748b; background: transparent;"><i
+            <button class="btn-outline-sm" onclick="shareProfile()" title="Share Profile"
+                style="padding: 0.4rem 0.6rem; border-color: var(--border); color: #64748b; background: transparent; cursor: pointer;"><i
                     class="fas fa-share-alt"></i></button>
-            <button class="btn-outline-sm"
-                style="padding: 0.4rem 0.6rem; border-color: var(--border); color: #ef4444; background: transparent;"><i
+            <button class="btn-outline-sm" onclick="reportUser()" title="Report User"
+                style="padding: 0.4rem 0.6rem; border-color: var(--border); color: #ef4444; background: transparent; cursor: pointer;"><i
                     class="fas fa-exclamation-triangle"></i></button>
         </div>
 
@@ -213,4 +213,118 @@
     {% endif %}
 
 </div>
+
+<!-- Report Modal -->
+<div id="reportModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <h3 style="margin-top: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Report User
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Please select a reason for reporting. Admins will review this.</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-main); font-weight: 500;">
+                <input type="radio" name="reportReason" value="Scammer / Fake Profile" checked> Scammer / Fake Profile
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-main); font-weight: 500;">
+                <input type="radio" name="reportReason" value="Abusive Language / Behavior"> Abusive Language / Behavior
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-main); font-weight: 500;">
+                <input type="radio" name="reportReason" value="Spam / Irrelevant Listings"> Spam / Irrelevant Listings
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-main); font-weight: 500;">
+                <input type="radio" name="reportReason" value="Other" onchange="toggleOtherReason()"> Other
+            </label>
+        </div>
+
+        <div id="otherReasonContainer" style="display: none; margin-bottom: 1.5rem;">
+            <input type="text" id="otherReasonInput" placeholder="Please specify the reason..." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); outline: none;">
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+            <button onclick="document.getElementById('reportModal').style.display='none'" style="padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--text-main); font-weight: 600; cursor: pointer;">Cancel</button>
+            <button onclick="submitReport()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #ef4444; color: white; font-weight: 600; cursor: pointer;">
+                Submit 
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send">
+                    <path d="m22 2-7 20-4-9-9-4Z"></path>
+                    <path d="M22 2 11 13"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showToast(message, isError = false) {
+    let toast = document.getElementById('profile-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'profile-toast';
+        document.body.appendChild(toast);
+    }
+    toast.style.cssText = `position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, -10px); background: ${isError ? '#ef4444' : '#1e293b'}; color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 10001; transition: all 0.3s ease; opacity: 1;`;
+    toast.innerHTML = message;
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, 0)';
+    }, 3000);
+}
+
+function shareProfile() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ p_user.username }} on CampusKart',
+            url: window.location.href
+        }).catch(err => console.log('Share canceled:', err));
+    } else {
+        navigator.clipboard.writeText(window.location.href)
+            .then(() => showToast('<i class="fas fa-link"></i> Profile link copied!'))
+            .catch(() => showToast('Failed to copy link', true));
+    }
+}
+
+function reportUser() {
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function toggleOtherReason() {
+    const isOther = document.querySelector('input[name="reportReason"]:checked').value === 'Other';
+    document.getElementById('otherReasonContainer').style.display = isOther ? 'block' : 'none';
+}
+
+// Add event listeners to all radio buttons to toggle the "Other" input
+document.querySelectorAll('input[name="reportReason"]').forEach(radio => {
+    radio.addEventListener('change', toggleOtherReason);
+});
+
+function submitReport() {
+    const reason = document.querySelector('input[name="reportReason"]:checked').value;
+    const finalReason = reason === 'Other' ? document.getElementById('otherReasonInput').value : reason;
+    
+    if (reason === 'Other' && !finalReason.trim()) {
+        alert('Please specify the reason.');
+        return;
+    }
+
+    fetch("{{ url_for('report_user') }}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            reported_id: '{{ p_user.id or p_user.email }}',
+            reason: finalReason
+        })
+    }).then(res => res.json()).then(data => {
+        if(data.status === 'success') {
+            showToast('<i class="fas fa-shield-halved"></i> User reported successfully');
+            document.getElementById('reportModal').style.display = 'none';
+        } else {
+            showToast('Failed to report user.');
+        }
+    }).catch(err => {
+        console.error(err);
+        showToast('An error occurred.');
+    });
+}
+</script>
 {% endblock %}
