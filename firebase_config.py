@@ -21,7 +21,14 @@ def _build_cred():
 
     # Option B: individual env vars (Vercel / CI)
     project_id    = os.environ.get("FIREBASE_PROJECT_ID", "")
-    private_key   = os.environ.get("FIREBASE_PRIVATE_KEY", "").replace("\\n", "\n")
+    raw_key       = os.environ.get("FIREBASE_PRIVATE_KEY", "")
+    # Format key properly regardless of how it was pasted
+    private_key   = raw_key.replace("\\n", "\n")
+    if "-----BEGIN PRIVATE KEY-----" in private_key and "\n" not in private_key:
+        private_key = private_key.replace(" ", "\n")
+        private_key = private_key.replace("-----BEGIN\nPRIVATE\nKEY-----", "-----BEGIN PRIVATE KEY-----")
+        private_key = private_key.replace("-----END\nPRIVATE\nKEY-----", "-----END PRIVATE KEY-----")
+        
     client_email  = os.environ.get("FIREBASE_CLIENT_EMAIL", "")
     private_key_id = os.environ.get("FIREBASE_PRIVATE_KEY_ID", "")
     client_id     = os.environ.get("FIREBASE_CLIENT_ID", "")
@@ -52,12 +59,12 @@ def init_firebase():
     if firebase_initialized:
         return db, bucket
 
-    cred = _build_cred()
-    if not cred:
-        print("[WARNING] Firebase credentials not found. Set FIREBASE_CREDENTIALS_PATH or env vars.")
-        return None, None
-
     try:
+        cred = _build_cred()
+        if not cred:
+            print("[WARNING] Firebase credentials not found. Set FIREBASE_CREDENTIALS_PATH or env vars.")
+            return None, None
+            
         storage_bucket_name = os.environ.get("FIREBASE_STORAGE_BUCKET", "")
         if not firebase_admin._apps:
             init_kwargs = {"credential": cred}
