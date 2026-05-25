@@ -30,6 +30,7 @@ body {
     line-height: 1.5;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden; /* Fix horizontal overflow */
 }
 
 a {
@@ -428,6 +429,14 @@ nav {
     /* Pushes footer down */
 }
 
+/* Categories Container */
+.categories-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 3.5rem;
+}
+
 /* Modernized Product Cards */
 .product-grid {
     display: grid;
@@ -747,33 +756,73 @@ nav {
     }
 
     .product-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Keep navbar in ONE ROW on mobile — logo left, links scroll right */
+    nav {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        padding: 0.6rem 0.8rem;
+        gap: 0.5rem;
+    }
+    
+    .logo {
+        flex-shrink: 0;
+        margin-bottom: 0;
+    }
+    
+    .logo span {
+        font-size: 1.2rem !important;
+    }
+    
+    .logo svg {
+        width: 26px !important;
+        height: 26px !important;
     }
     
     .nav-links {
         display: flex;
         overflow-x: auto;
-        padding-bottom: 5px;
+        padding-bottom: 0;
         -webkit-overflow-scrolling: touch;
         white-space: nowrap;
-        gap: 1rem;
-        margin-top: 0.5rem;
-        width: 100%;
-        justify-content: flex-start;
-    }
-    
-    nav {
-        flex-direction: column;
-        padding: 0.75rem 1rem;
+        gap: 0.6rem;
+        margin-top: 0;
+        flex: 1;
+        justify-content: flex-end;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
     
     .nav-links::-webkit-scrollbar {
         display: none;
     }
     
-    .logo {
-        align-self: center;
-        margin-bottom: 0.5rem;
+    .nav-links a {
+        font-size: 0.82rem;
+        padding: 0.3rem 0.4rem;
+        white-space: nowrap;
+    }
+    
+    .nav-icon-link {
+        font-size: 0.75rem !important;
+        gap: 0.25rem !important;
+        padding: 0.25rem 0.4rem !important;
+    }
+    
+    .nav-icon-link i {
+        font-size: 0.8rem;
+    }
+    
+    .nav-btn-sell {
+        padding: 0.3rem 0.7rem !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .nav-btn-logout {
+        padding: 0.3rem 0.5rem !important;
+        font-size: 0.75rem !important;
     }
 }
 
@@ -1402,10 +1451,39 @@ nav {
         text-align: center;
     }
 
-    /* Hide the hero image on mobile — it loads blank for other users */
+    /* Restore hero image on mobile but scale it down */
     .hero-right {
-        display: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-top: 1rem;
     }
+
+    .hero-image-container {
+        max-width: 280px;
+        height: 280px;
+        margin: 0 auto;
+    }
+    
+    .floating-badge {
+        padding: 0.6rem 0.8rem;
+        gap: 0.5rem;
+        border-radius: 14px;
+    }
+    
+    .floating-badge .icon-box {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+    
+    .floating-badge .badge-text span:first-child { font-size: 0.65rem; }
+    .floating-badge .badge-text span:last-child { font-size: 0.8rem; }
+    
+    .floating-badge.badge-1 { left: -15%; top: 5%; }
+    .floating-badge.badge-2 { right: -15%; bottom: 10%; }
+    .floating-badge.badge-3 { display: none; /* Hide 3rd badge on mobile to save space */ }
 
     /* Hero left fills full width */
     .hero-left {
@@ -1493,15 +1571,28 @@ nav {
         padding: 1.5rem 1rem 3rem;
     }
 
-    /* College chips */
-    .chips-container {
-        gap: 0.5rem;
-        justify-content: center;
+    /* College chips & Categories */
+    .chips-container,
+    .categories-container {
+        gap: 0.8rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .chips-container::-webkit-scrollbar,
+    .categories-container::-webkit-scrollbar {
+        display: none;
     }
 
     .college-chip {
         padding: 0.4rem 0.9rem;
         font-size: 0.82rem;
+        white-space: nowrap;
     }
 
     /* --- NAVBAR --- */
@@ -1587,9 +1678,17 @@ nav {
         text-align: center;
     }
 
-    /* On small tablets, hide the hero image too — prevents blank section */
+    /* On small tablets, restore hero image */
     .hero-right {
-        display: none;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .hero-image-container {
+        max-width: 320px;
+        height: 320px;
+        margin: 0 auto;
     }
 
     .hero-left h1 {
