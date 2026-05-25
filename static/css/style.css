@@ -1388,8 +1388,234 @@ nav {
     }
 }
 
-@media (max-width: 600px) {
-    .stats-section {
-        grid-template-columns: 1fr;
+/* ============================================
+   MOBILE RESPONSIVE - 480px and below
+   ============================================ */
+@media (max-width: 480px) {
+
+    /* --- HERO SECTION --- */
+    .split-hero {
+        flex-direction: column;
+        padding: 1.5rem 1.2rem 2rem;
+        gap: 1.5rem;
+        margin-top: 0.5rem;
+        text-align: center;
     }
-}
+
+    /* Hide the hero image on mobile — it loads blank for other users */
+    .hero-right {
+        display: none;
+    }
+
+    /* Hero left fills full width */
+    .hero-left {
+        flex: none;
+        width: 100%;
+    }
+
+    /* Badge pill */
+    .hero-badge {
+        font-size: 0.78rem;
+        padding: 0.45rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Big heading */
+    .hero-left h1 {
+        font-size: 2.2rem;
+        letter-spacing: -0.8px;
+        line-height: 1.15;
+        margin-bottom: 1rem;
+    }
+
+    /* Subtext */
+    .hero-left p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        max-width: 100%;
+    }
+
+    /* CTA buttons */
+    .hero-actions {
+        flex-direction: row;
+        gap: 0.8rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-actions .btn-primary,
+    .hero-actions .btn-secondary {
+        padding: 0.75rem 1.4rem;
+        font-size: 0.9rem;
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+        min-width: 130px;
+    }
+
+    /* Trust badges in row */
+    .hero-trust-badges {
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .trust-badge {
+        font-size: 0.8rem;
+    }
+
+    /* --- STATS SECTION --- */
+    .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        padding: 1.2rem;
+        margin: 0 1rem 1.5rem;
+        border-radius: 16px;
+    }
+
+    .stat-card {
+        padding: 1.2rem 0.8rem;
+        border-radius: 14px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    /* --- CONTAINER SECTIONS --- */
+    .container {
+        padding: 1.5rem 1rem 3rem;
+    }
+
+    /* College chips */
+    .chips-container {
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .college-chip {
+        padding: 0.4rem 0.9rem;
+        font-size: 0.82rem;
+    }
+
+    /* --- NAVBAR --- */
+    nav {
+        padding: 0.6rem 1rem;
+        flex-wrap: wrap;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    .nav-links {
+        gap: 0.6rem;
+        font-size: 0.85rem;
+        padding-bottom: 3px;
+    }
+
+    /* --- PRODUCT GRID --- */
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+
+    .product-card {
+        border-radius: 14px;
+    }
+
+    .product-card img {
+        height: 140px;
+    }
+
+    .card-body-modern {
+        padding: 0.8rem;
+    }
+
+    .product-title-modern {
+        font-size: 0.85rem;
+    }
+
+    .card-price-modern {
+        font-size: 1rem;
+    }
+
+    /* --- FOOTER MOBILE --- */
+    .main-footer {
+        padding: 2.5rem 0 1.5rem;
+        margin-top: 2.5rem;
+    }
+
+    .footer-container {
+        padding: 0 1rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 0.8rem;
+        text-align: center;
+        font-size: 0.78rem;
+    }
+
+    .footer-legal-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+}
+
+/* ============================================
+   TABLET RESPONSIVE - 600px to 768px
+   ============================================ */
+@media (min-width: 481px) and (max-width: 768px) {
+
+    .split-hero {
+        flex-direction: column;
+        padding: 2rem 1.5rem;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    /* On small tablets, hide the hero image too — prevents blank section */
+    .hero-right {
+        display: none;
+    }
+
+    .hero-left h1 {
+        font-size: 2.6rem;
+    }
+
+    .hero-actions {
+        justify-content: center;
+    }
+
+    .hero-trust-badges {
+        justify-content: center;
+    }
+
+    .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
