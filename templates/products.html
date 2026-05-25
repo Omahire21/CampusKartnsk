@@ -1,52 +1,81 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container" style="max-width: 1440px; margin: 0 auto; padding: 2rem 5% 5rem;">
-    <!-- Shop Page Header -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1.5rem;">
+<style>
+        /* Desktop filter - no scroll */
+        @media (min-width: 769px) {
+            .products-filter-form {
+                flex-wrap: nowrap !important;
+                overflow-x: visible !important;
+            }
+            .products-filter-form .search-group {
+                min-width: 0 !important;
+                flex: 1 1 0 !important;
+            }
+            .products-filter-form .form-group {
+                min-width: 0 !important;
+                flex: 0 1 auto !important;
+            }
+            .products-filter-form select {
+                min-width: 100px;
+                max-width: 150px;
+                font-size: 0.82rem;
+                padding: 0 0.5rem;
+            }
+            .products-filter-form .btn-primary,
+            .products-filter-form .btn-secondary {
+                flex-shrink: 0;
+                padding: 0 0.8rem;
+                font-size: 0.82rem;
+            }
+        }
+    </style>
+    <div class="container" style="max-width: 1440px; margin: 0 auto; padding: 2rem 5% 5rem;">
+        <!-- Shop Page Header -->
+        <div class="shop-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: nowrap; gap: 1rem;">
         <div>
-            <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">Explore Campus Marketplace</h1>
-            <p style="color: var(--text-muted); font-weight: 500;">
+            <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">Explore Campus Marketplace</h1>
+            <p style="color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
                 Showing products from <strong>{{ current_college.split('(')[0].strip() if current_college else 'All Nashik Colleges' }}</strong>
             </p>
         </div>
 
         <!-- Glassmorphism Filter & Search Form -->
-        <form action="{{ url_for('products') }}" method="GET" style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center;">
-            <div class="form-group" style="margin: 0; min-width: 280px; position: relative;" id="searchWrapper">
+        <form action="{{ url_for('products') }}" method="GET" class="products-filter-form" style="display: flex; gap: 0.4rem; flex-wrap: nowrap; align-items: center; width: 100%;">
+            <div class="form-group search-group" style="margin: 0; min-width: 0; flex: 1 1 0; position: relative;" id="searchWrapper">
                 <!-- Inline SVG magnifier - always renders -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                      stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                     style="position: absolute; left: 1rem; top: 14px; pointer-events: none; z-index: 2;">
+                     style="position: absolute; left: 0.8rem; top: 10px; pointer-events: none; z-index: 2;">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <input type="text" name="search" id="liveSearchInput"
-                       placeholder="Search textbooks, calculators..."
+                       placeholder="Search..."
                        value="{{ request.args.get('search', '') }}"
                        autocomplete="off"
-                       style="padding-left: 2.6rem; background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 500; height: 42px; width: 100%;"
+                       style="padding-left: 2rem; background: white; border-radius: 10px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 500; height: 36px; width: 100%;"
                        onfocus="this.style.borderColor='var(--primary)';this.style.boxShadow='0 0 0 3px rgba(108,76,241,0.08)'"
                        onblur="setTimeout(()=>{this.style.borderColor='var(--border)';this.style.boxShadow='none';}, 200)">
                 <!-- Live search dropdown -->
-                <div id="searchDropdown" style="display:none; position: absolute; top: 48px; left: 0; right: 0; background: white; border: 1.5px solid var(--border); border-radius: 16px; box-shadow: 0 12px 32px rgba(108,76,241,0.12); z-index: 100; overflow: hidden; max-height: 400px; overflow-y: auto;"></div>
+                <div id="searchDropdown" style="display:none; position: absolute; top: 44px; left: 0; right: 0; background: white; border: 1.5px solid var(--border); border-radius: 16px; box-shadow: 0 12px 32px rgba(108,76,241,0.12); z-index: 100; overflow: hidden; max-height: 400px; overflow-y: auto;"></div>
             </div>
             
-            <div class="form-group" style="margin: 0; min-width: 160px;">
+            <div class="form-group" style="margin: 0; min-width: 0; flex: 0 1 auto;">
                 <select name="category" onchange="this.form.submit()" 
-                        style="background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 600; height: 42px; padding: 0 1rem;">
+                        style="background: white; border-radius: 10px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 600; height: 36px; padding: 0 0.5rem;">
                     <option value="">All Categories</option>
                     <option value="Books" {% if request.args.get('category')=='Books' %}selected{% endif %}>Books</option>
                     <option value="Electronics" {% if request.args.get('category')=='Electronics' %}selected{% endif %}>Electronics</option>
                     <option value="Calculators" {% if request.args.get('category')=='Calculators' %}selected{% endif %}>Calculators</option>
-                    <option value="Stationery" {% if request.args.get('category')=='Stationery' %}selected{% endif %}>Stationery/Lab Kits</option>
-                    <option value="Hostel" {% if request.args.get('category')=='Hostel' %}selected{% endif %}>Hostel Essentials</option>
+                    <option value="Stationery" {% if request.args.get('category')=='Stationery' %}selected{% endif %}>Stationery</option>
+                    <option value="Hostel" {% if request.args.get('category')=='Hostel' %}selected{% endif %}>Hostel</option>
                 </select>
             </div>
 
-            <div class="form-group" style="margin: 0; min-width: 200px; max-width: 250px;">
+            <div class="form-group" style="margin: 0; min-width: 0; flex: 0 1 auto;">
                 <select name="college" onchange="this.form.submit()"
-                        style="background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 600; height: 42px; padding: 0 1rem; width: 100%;">
+                        style="background: white; border-radius: 10px; border: 1.5px solid var(--border); font-size: 0.88rem; font-weight: 600; height: 36px; padding: 0 0.5rem;">
                     <option value="">All Colleges</option>
                     {% for college in colleges %}
                     <option value="{{ college }}" {% if current_college==college %}selected{% endif %}>
@@ -56,11 +85,11 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-primary" style="height: 42px; display: flex; align-items: center; justify-content: center; padding: 0 1.5rem; border-radius: 12px;">
+            <button type="submit" class="btn-primary" style="height: 36px; display: flex; align-items: center; justify-content: center; padding: 0 0.8rem; border-radius: 10px; flex-shrink: 0; font-size: 0.85rem;">
                 Filter
             </button>
             <a href="{{ url_for('products') }}" class="btn-secondary"
-               style="height: 42px; display: flex; align-items: center; justify-content: center; padding: 0 1.2rem; border-radius: 12px; background: white; border: 1.5px solid var(--border); text-decoration: none; color: var(--text-main); font-weight: 600; box-shadow: none;">
+               style="height: 36px; display: flex; align-items: center; justify-content: center; padding: 0 0.8rem; border-radius: 10px; background: white; border: 1.5px solid var(--border); text-decoration: none; color: var(--text-main); font-weight: 600; box-shadow: none; flex-shrink: 0; font-size: 0.85rem;">
                 Clear
             </a>
         </form>

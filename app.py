@@ -79,7 +79,7 @@ def login_required(f):
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
             flash('Please log in to continue.', 'error')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated
 
@@ -192,9 +192,12 @@ def login():
             kyc = fb.get_kyc(user['id'])
             session['kyc_status'] = kyc['status'] if kyc else 'not_submitted'
             flash(f"Welcome back, {user['username']}!", 'success')
-            return redirect(url_for('admin') if user.get('is_admin') else url_for('products'))
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
+            return redirect(url_for('admin') if user.get('is_admin') else url_for('index'))
         flash('Invalid credentials.', 'error')
-        return redirect(url_for('login'))
+        return redirect(url_for('login', **request.args))
     return render_template('login.html')
 
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusKart – College Marketplace</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=4.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- Instant Navigation & Transitions -->
@@ -20,6 +20,49 @@
         .turbo-progress-bar {
             height: 4px;
             background-color: var(--primary);
+        }
+        
+        /* Hide menu toggle by default on desktop */
+        .menu-toggle {
+            display: none;
+        }
+        
+        /* Desktop nav layout */
+        @media (min-width: 769px) {
+            .nav-links {
+                display: flex !important;
+            }
+            .mobile-legal-menu {
+                display: none !important;
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none; /* Hide by default on mobile */
+                flex-direction: column;
+                position: absolute;
+                top: 65px;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 1.5rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                border-bottom: 1px solid var(--border);
+                max-height: calc(100vh - 65px);
+                overflow-y: auto;
+                z-index: 999;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+            .nav-links.active {
+                display: flex !important;
+            }
+            .nav-icon-link, .nav-btn-sell, .nav-btn-logout {
+                width: 100%;
+                text-align: left;
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
@@ -47,6 +90,15 @@
             -ms-user-select: none; /* IE10+/Edge */
             user-select: none; /* Standard */
         }
+        
+        /* Force legal menu rules regardless of Flask static file caching */
+        @media (min-width: 769px) {
+            .mobile-only-flex, .mobile-only-block { display: none !important; }
+        }
+        @media (max-width: 768px) {
+            .mobile-only-flex { display: flex !important; }
+            .mobile-only-block { display: block !important; }
+        }
     </style>
     <nav>
         <a href="{{ url_for('index') }}" class="logo" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
@@ -65,7 +117,14 @@
             </svg>
             <span style="font-weight: 900; font-size: 1.5rem; letter-spacing: -0.5px; color: #6C4CF1;">Campus<span style="color: #1e293b;">Kart</span></span>
         </a>
-        <div class="nav-links">
+        
+        <!-- Mobile Page Title Removed -->
+        <!-- Menu Toggle Button (mobile) -->
+        <button class="menu-toggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-links" id="navLinks">
             {% if session.get('user_id') %}
             {% if session.get('is_admin') %}
             {% if request.path != url_for('admin') %}
@@ -98,6 +157,13 @@
             <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}" class="btn-primary" style="color: white !important; border-radius: 8px !important;">Sign Up</a>
             {% endif %}
+            
+            <!-- Mobile Only Legal Links -->
+            <hr class="mobile-only-block" style="width: 100%; border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
+            <a href="{{ url_for('privacy') }}" class="nav-icon-link mobile-only-flex"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+            <a href="{{ url_for('terms') }}" class="nav-icon-link mobile-only-flex"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="{{ url_for('safety') }}" class="nav-icon-link mobile-only-flex"><i class="fas fa-user-shield"></i> Safety Guide</a>
+            <a href="{{ url_for('rules') }}" class="nav-icon-link mobile-only-flex"><i class="fas fa-book-open"></i> Community Rules</a>
         </div>
     </nav>
 
@@ -126,7 +192,7 @@
     </main>
 
     {% if request.path not in [url_for('login'), url_for('register'), url_for('forgot_password'), url_for('safety'), url_for('rules'), url_for('privacy'), url_for('terms'), url_for('admin')] %}
-    <footer class="main-footer">
+    <footer class="main-footer{% if request.path != '/' %} desktop-only-footer{% endif %}">
         <div class="footer-container">
             <!-- Brand & Info -->
             <div class="footer-col brand-col">
@@ -170,7 +236,7 @@
             </div>
 
             <!-- Categories -->
-            <div class="footer-col">
+            <div class="footer-col categories-col">
                 <h3>Categories</h3>
                 <ul class="footer-links">
                     <li><a href="{{ url_for('products', category='Books') }}">Textbooks</a></li>
@@ -186,32 +252,36 @@
                 <h3>Get in Touch</h3>
                 <ul class="footer-contact">
                     <li><i class="fas fa-map-marker-alt"></i> Nashik, Maharashtra</li>
-                    <li><i class="fas fa-envelope"></i> campuskart21@gmail.com</li>
+                    <li><i class="fas fa-envelope"></i> <a href="mailto:campuskart21@gmail.com" style="color: inherit; text-decoration: none;">campuskart21@gmail.com</a></li>
                     <li><i class="fas fa-phone"></i> +91 77588 76827</li>
                 </ul>
             </div>
+
+
         </div>
 
-        <div class="footer-bottom" style="border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1.5rem; padding-bottom: 1.5rem;">
-            <div class="footer-container" style="display: block;">
-                <div class="footer-bottom-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0; font-weight: 600;">&copy; 2026 CampusKart Nashik. All Rights Reserved.</p>
-                    <div class="footer-legal-links">
-                        <a href="{{ url_for('privacy') }}" class="legal-link">Privacy Policy</a>
-                        <a href="{{ url_for('terms') }}" class="legal-link">Terms of Service</a>
-                        <a href="{{ url_for('safety') }}" class="legal-link">Safety Guidelines</a>
-                        <a href="{{ url_for('rules') }}" class="legal-link">Community Rules</a>
-                    </div>
-                </div>
-
-                <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.06); margin: 1.5rem 0 1rem 0;">
-
-                <div style="text-align: center;">
-                    <p style="font-size: 0.75rem; color: #64748b; line-height: 1.6; margin: 0;">
-                        <strong style="color: #0f172a; font-weight: 800;">Legal Disclaimer:</strong> CampusKart is a peer-to-peer student platform. We do not process payments. Administrators are not liable for disputes or incidents. Trade entirely at your own risk.
-                    </p>
-                </div>
+        <!-- Rewritten Footer Bottom to guarantee centering -->
+        <div style="border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1.5rem; padding-bottom: 1.5rem; text-align: center; width: 100%;">
+            
+            <!-- 2026 Copyright text -->
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 auto; font-weight: 600; text-align: center;">&copy; 2026 CampusKart Nashik. All Rights Reserved.</p>
+            
+            <!-- Desktop Legal Links -->
+            <div class="footer-legal-links" style="margin-top: 1rem; text-align: center; width: 100%; display: block;">
+                <a href="{{ url_for('privacy') }}" style="margin: 0 10px; color: var(--text-muted); font-size: 0.8rem; text-decoration: none; display: inline-block;">Privacy Policy</a>
+                <a href="{{ url_for('terms') }}" style="margin: 0 10px; color: var(--text-muted); font-size: 0.8rem; text-decoration: none; display: inline-block;">Terms and Service</a>
+                <a href="{{ url_for('safety') }}" style="margin: 0 10px; color: var(--text-muted); font-size: 0.8rem; text-decoration: none; display: inline-block;">Safety Guide</a>
+                <a href="{{ url_for('rules') }}" style="margin: 0 10px; color: var(--text-muted); font-size: 0.8rem; text-decoration: none; display: inline-block;">Community Rules</a>
             </div>
+
+            <!-- Divider -->
+            <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.06); margin: 1.5rem auto 1rem auto; max-width: 90%;">
+
+            <!-- Legal Disclaimer -->
+            <p style="font-size: 0.75rem; color: #64748b; line-height: 1.6; margin: 0 auto; text-align: center; max-width: 90%;">
+                <strong style="color: #0f172a; font-weight: 800;">Legal Disclaimer:</strong> CampusKart is a peer-to-peer student platform. We do not process payments. Administrators are not liable for disputes or incidents. Trade entirely at your own risk.
+            </p>
+            
         </div>
     </footer>
     {% endif %}
@@ -311,6 +381,8 @@
             document.querySelectorAll('.flash').forEach(f => f.style.display = 'none');
         }, 5000);
 
+
+
         // Global AJAX Favorite Toggle
         function handleFavorite(e, productId) {
             if(e && e.preventDefault) e.preventDefault();
@@ -397,6 +469,42 @@
             })
             .catch(err => console.error('Error toggling favorite:', err));
             return false;
+        }
+    </script>
+
+    <!-- Hamburger Menu Toggle -->
+    <script>
+        // Global Event Delegation for Menu (Survives Turbo Navigations)
+        if (!window.menuListenerAdded) {
+            window.menuListenerAdded = true;
+            document.addEventListener('click', function(e) {
+                const toggle = e.target.closest('.menu-toggle');
+                const navLinks = document.getElementById('navLinks');
+                
+                // 1. If Menu Toggle is clicked
+                if (toggle && navLinks) {
+                    e.preventDefault();
+                    const isOpen = navLinks.classList.contains('active');
+                    navLinks.classList.toggle('active');
+                    const icon = toggle.querySelector('i');
+                    if (icon) {
+                        icon.className = isOpen ? 'fas fa-bars' : 'fas fa-xmark';
+                    }
+                    return; // Stop here
+                }
+
+                // 2. If menu is open and clicking outside or on a link
+                if (navLinks && navLinks.classList.contains('active')) {
+                    const isLink = e.target.closest('a');
+                    const isOutside = !navLinks.contains(e.target);
+                    
+                    if (isLink || isOutside) {
+                        navLinks.classList.remove('active');
+                        const currentToggle = document.querySelector('.menu-toggle i');
+                        if (currentToggle) currentToggle.className = 'fas fa-bars';
+                    }
+                }
+            });
         }
     </script>
 </body>

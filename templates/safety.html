@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 4rem auto; padding: 2.5rem; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border);">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+        <div style="width: 70px; height: 70px; background: rgba(108, 76, 241, 0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1.2rem;">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1 style="color: var(--text-main); font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem;">Safety Guidelines</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">Your safety is our top priority. Please read these guidelines before meeting anyone.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid var(--primary); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 0.5rem;"></i>Meet in Public, Safe Locations</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">Always meet during daylight hours in busy, public areas of the campus such as the library, cafeteria, or student union. Never go to a stranger's dorm room or invite them to yours.</p>
+        </div>
+        
+        <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid var(--primary); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;"><i class="fas fa-money-bill-wave" style="color: var(--primary); margin-right: 0.5rem;"></i>Verify the Item Before Paying</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">Inspect the product thoroughly to ensure it matches the description. For electronics, turn them on and check basic functionality before handing over any money.</p>
+        </div>
+
+        <div style="padding: 1.5rem; background: #f8fafc; border-radius: 12px; border-left: 4px solid var(--primary); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <h3 style="color: var(--text-main); font-size: 1.15rem; margin-bottom: 0.5rem;"><i class="fas fa-comments" style="color: var(--primary); margin-right: 0.5rem;"></i>Keep Conversations on CampusKart</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">Avoid sharing personal phone numbers or social media handles immediately. Use the in-app chat to discuss prices and meeting spots to maintain a record of your conversation in case of disputes.</p>
+        </div>
+    </div>
+    
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="{{ url_for('index') }}" class="btn-primary" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 50px; text-decoration: none; font-weight: 600;">Back to Home</a>
+    </div>
+</div>
+{% endblock %}
