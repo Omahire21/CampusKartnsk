@@ -1444,104 +1444,90 @@ nav {
 
     /* --- HERO SECTION --- */
     .split-hero {
-        flex-direction: column;
-        padding: 1.5rem 1.2rem 2rem;
-        gap: 1.5rem;
-        margin-top: 0.5rem;
-        text-align: center;
+        flex-direction: row;
+        padding: 1rem 0.8rem 1.5rem;
+        gap: 0.5rem;
+        margin-top: 0;
+        text-align: left;
+        align-items: center;
+        justify-content: space-between;
     }
 
     /* Restore hero image on mobile but scale it down */
     .hero-right {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        margin-top: 1rem;
+        flex: 1;
+        width: auto;
+        margin-top: 0;
+        justify-content: flex-end;
     }
 
     .hero-image-container {
-        max-width: 280px;
-        height: 280px;
-        margin: 0 auto;
+        max-width: 140px;
+        height: 140px;
+        margin: 0;
     }
     
     .floating-badge {
-        padding: 0.6rem 0.8rem;
-        gap: 0.5rem;
-        border-radius: 14px;
+        display: none; /* Hide floating badges to save space on mobile */
     }
-    
-    .floating-badge .icon-box {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
-    }
-    
-    .floating-badge .badge-text span:first-child { font-size: 0.65rem; }
-    .floating-badge .badge-text span:last-child { font-size: 0.8rem; }
-    
-    .floating-badge.badge-1 { left: -15%; top: 5%; }
-    .floating-badge.badge-2 { right: -15%; bottom: 10%; }
-    .floating-badge.badge-3 { display: none; /* Hide 3rd badge on mobile to save space */ }
 
-    /* Hero left fills full width */
+    /* Hero left */
     .hero-left {
-        flex: none;
-        width: 100%;
+        flex: 1.4;
+        width: auto;
     }
 
     /* Badge pill */
     .hero-badge {
-        font-size: 0.78rem;
-        padding: 0.45rem 1rem;
-        margin-bottom: 1rem;
+        font-size: 0.65rem;
+        padding: 0.35rem 0.7rem;
+        margin-bottom: 0.6rem;
     }
 
     /* Big heading */
     .hero-left h1 {
-        font-size: 2.2rem;
-        letter-spacing: -0.8px;
-        line-height: 1.15;
-        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+        margin-bottom: 0.5rem;
     }
 
     /* Subtext */
     .hero-left p {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        margin-bottom: 0.8rem;
         max-width: 100%;
     }
 
     /* CTA buttons */
     .hero-actions {
-        flex-direction: row;
-        gap: 0.8rem;
-        justify-content: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: nowrap;
     }
 
     .hero-actions .btn-primary,
     .hero-actions .btn-secondary {
-        padding: 0.75rem 1.4rem;
-        font-size: 0.9rem;
-        flex: 1;
-        text-align: center;
-        justify-content: center;
-        min-width: 130px;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        flex: none;
+        width: auto;
+        min-width: unset;
     }
 
-    /* Trust badges in row */
+    /* Trust badges */
     .hero-trust-badges {
-        justify-content: center;
-        gap: 1rem;
+        justify-content: flex-start;
+        gap: 0.6rem;
         flex-wrap: wrap;
     }
 
     .trust-badge {
-        font-size: 0.8rem;
+        font-size: 0.65rem;
     }
 
     /* --- STATS SECTION --- */
@@ -1614,27 +1600,43 @@ nav {
     /* --- PRODUCT GRID --- */
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 0.8rem;
+        gap: 0.6rem;
     }
 
     .product-card {
-        border-radius: 14px;
+        border-radius: 12px;
     }
 
     .product-card img {
-        height: 140px;
+        height: 120px;
     }
 
-    .card-body-modern {
-        padding: 0.8rem;
+    .product-info-modern {
+        padding: 0.6rem;
     }
 
-    .product-title-modern {
-        font-size: 0.85rem;
+    .product-info-modern h4 {
+        font-size: 0.8rem;
+        height: 2.2rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .product-college-meta {
+        font-size: 0.65rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .card-footer-modern {
+        padding-top: 0.4rem;
     }
 
     .card-price-modern {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .card-footer-modern a {
+        padding: 0.35rem 0.6rem !important;
+        font-size: 0.7rem !important;
     }
 
     /* --- FOOTER MOBILE --- */
