@@ -951,6 +951,25 @@ nav {
     }
 }
 
+/* Footer Legal Links */
+.footer-legal-links {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.legal-link {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.legal-link:hover {
+    color: var(--primary);
+}
+
 /* Back Button Styles */
 .btn-back {
     background: none;
@@ -1405,27 +1424,39 @@ nav {
 /* Responsive adjust */
 @media (max-width: 1024px) {
     .split-hero {
-        flex-direction: column;
-        text-align: center;
-        padding-top: 1rem;
-        gap: 2.5rem;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        padding: 2rem 5%;
+        gap: 2rem;
     }
     
+    .hero-left {
+        flex: 1.2;
+    }
+
+    .hero-right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+    }
+
     .hero-left h1 {
-        font-size: 2.8rem;
+        font-size: 2.2rem;
     }
     
     .hero-actions {
-        justify-content: center;
+        justify-content: flex-start;
     }
     
     .hero-trust-badges {
-        justify-content: center;
+        justify-content: flex-start;
     }
     
     .hero-image-container {
-        max-width: 360px;
-        height: 360px;
+        max-width: 280px;
+        height: 280px;
+        margin: 0;
     }
     
     .floating-badge.badge-1 { left: -5%; }
@@ -1641,30 +1672,75 @@ nav {
 
     /* --- FOOTER MOBILE --- */
     .main-footer {
-        padding: 2.5rem 0 1.5rem;
-        margin-top: 2.5rem;
+        padding: 2rem 0 1.5rem;
+        margin-top: 2rem;
     }
 
     .footer-container {
-        padding: 0 1rem;
+        padding: 0 1.2rem;
+        gap: 2rem;
     }
 
-    .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+    .footer-col h3 {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+        font-size: 0.85rem;
+    }
+
+    .footer-contact li {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .brand-col p {
+        font-size: 0.85rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .footer-social {
+        gap: 0.6rem;
+    }
+    
+    .footer-social a {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .footer-social a img {
+        width: 18px;
+        height: 18px;
     }
 
     .footer-bottom {
+        margin-top: 1.5rem !important;
+        padding-top: 1.2rem !important;
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 1rem;
         text-align: center;
-        font-size: 0.78rem;
+    }
+    
+    .footer-bottom p {
+        font-size: 0.75rem !important;
+    }
+
+    .footer-bottom-flex {
+        flex-direction: column !important;
+        justify-content: center !important;
+        gap: 1rem !important;
     }
 
     .footer-legal-links {
+        display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.8rem !important;
+    }
+    
+    .legal-link {
+        font-size: 0.7rem !important;
     }
 }
 
@@ -1674,35 +1750,51 @@ nav {
 @media (min-width: 481px) and (max-width: 768px) {
 
     .split-hero {
-        flex-direction: column;
-        padding: 2rem 1.5rem;
-        gap: 2rem;
-        text-align: center;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        padding: 1.5rem 1.5rem;
+        gap: 1.5rem;
     }
 
-    /* On small tablets, restore hero image */
+    .hero-left {
+        flex: 1.2;
+    }
+
     .hero-right {
         display: flex;
-        justify-content: center;
-        width: 100%;
+        justify-content: flex-end;
+        flex: 1;
+        width: auto;
     }
     
     .hero-image-container {
-        max-width: 320px;
-        height: 320px;
-        margin: 0 auto;
+        max-width: 200px;
+        height: 200px;
+        margin: 0;
+    }
+    
+    .floating-badge {
+        display: none; /* Hide floating badges on tablet to save space */
     }
 
     .hero-left h1 {
-        font-size: 2.6rem;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-left p {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
     }
 
     .hero-actions {
-        justify-content: center;
+        justify-content: flex-start;
+        gap: 0.5rem;
     }
 
     .hero-trust-badges {
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .stats-section {

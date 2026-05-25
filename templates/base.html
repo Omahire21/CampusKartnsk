@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusKart – College Marketplace</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- Instant Navigation & Transitions -->
@@ -194,13 +194,13 @@
 
         <div class="footer-bottom" style="border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1.5rem; padding-bottom: 1.5rem;">
             <div class="footer-container" style="display: block;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                <div class="footer-bottom-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0; font-weight: 600;">&copy; 2026 CampusKart Nashik. All Rights Reserved.</p>
-                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-                        <a href="{{ url_for('privacy') }}" style="font-size: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">Privacy Policy</a>
-                        <a href="{{ url_for('terms') }}" style="font-size: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">Terms of Service</a>
-                        <a href="{{ url_for('safety') }}" style="font-size: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">Safety Guidelines</a>
-                        <a href="{{ url_for('rules') }}" style="font-size: 0.75rem; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">Community Rules</a>
+                    <div class="footer-legal-links">
+                        <a href="{{ url_for('privacy') }}" class="legal-link">Privacy Policy</a>
+                        <a href="{{ url_for('terms') }}" class="legal-link">Terms of Service</a>
+                        <a href="{{ url_for('safety') }}" class="legal-link">Safety Guidelines</a>
+                        <a href="{{ url_for('rules') }}" class="legal-link">Community Rules</a>
                     </div>
                 </div>
 
