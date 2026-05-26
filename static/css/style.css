@@ -523,6 +523,56 @@ nav {
     margin-bottom: 3.5rem;
 }
 
+.category-pill {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    padding: 0.6rem 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+@media (hover: hover) {
+    .category-pill:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+}
+
+.category-pill-view-all {
+    background: white;
+    border: 1.5px dashed var(--border);
+    border-radius: 50px;
+    padding: 0.6rem 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+@media (hover: hover) {
+    .category-pill-view-all:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+}
+
 /* Modernized Product Cards */
 .product-grid {
     display: grid;
@@ -925,26 +975,26 @@ nav {
 
     /* ── Floating Badges – Mobile Size Reduction ── */
     .floating-badge {
-        padding: 0.45rem 0.7rem;
-        gap: 0.45rem;
-        border-radius: 12px;
+        padding: 0.45rem 0.7rem !important;
+        gap: 0.45rem !important;
+        border-radius: 12px !important;
     }
 
     .floating-badge .icon-box {
-        width: 26px;
-        height: 26px;
-        border-radius: 7px;
-        font-size: 0.7rem;
+        width: 26px !important;
+        height: 26px !important;
+        border-radius: 7px !important;
+        font-size: 0.7rem !important;
         flex-shrink: 0;
     }
 
     .floating-badge .badge-text span:first-child {
-        font-size: 0.55rem;
+        font-size: 0.55rem !important;
         letter-spacing: 0.3px;
     }
 
     .floating-badge .badge-text span:last-child {
-        font-size: 0.72rem;
+        font-size: 0.72rem !important;
     }
 
     /* Tighten badge positions so they stay within image bounds */
@@ -2215,28 +2265,29 @@ nav {
     /* Quick Links - LEFT */
     .footer-col:nth-child(2) {
         order: 1;
-        text-align: left;
-        justify-self: start;
+        text-align: center;
+        justify-self: center;
+        width: 100%;
     }
 
     /* Legal - CENTER */
     .legal-col-mobile {
         display: block !important;
         order: 2;
-        text-align: left;
-        justify-self: start;
+        text-align: center;
+        justify-self: center;
         width: 100%;
     }
 
     /* Get in touch - RIGHT */
     .footer-col:nth-child(4) {
         order: 3;
-        grid-column: 2;
-        grid-row: 2;
-        text-align: left !important;
+        grid-column: 1 / -1;
+        text-align: center !important;
         padding-top: 0 !important;
         border-top: none !important;
-        justify-self: start;
+        justify-self: center;
+        width: 100%;
     }
 
     .footer-col h3 {
@@ -2252,7 +2303,8 @@ nav {
         content: '';
         position: absolute;
         bottom: 0;
-        left: 0;
+        left: 50%;
+        transform: translateX(-50%);
         width: 24px;
         height: 2px;
         background: var(--primary);
