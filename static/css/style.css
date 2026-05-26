@@ -104,6 +104,16 @@ nav {
 .nav-active {
     color: var(--primary) !important;
     font-weight: 700 !important;
+    background: rgba(99, 102, 241, 0.1) !important;
+    border-radius: 8px !important;
+}
+
+@media (max-width: 768px) {
+    .nav-links a.nav-active {
+        background: rgba(99, 102, 241, 0.15) !important;
+        border-radius: 8px !important;
+        padding: 0.5rem !important;
+    }
 }
 
 .nav-btn-sell {
