@@ -1963,14 +1963,14 @@ nav {
     }
 
 /* Hide internal back button on mobile */
-     .ap-back-btn {
-         display: none !important;
-     }
+      .ap-back-btn {
+          display: none !important;
+      }
 
-     /* Profile mobile styles */
-     #coverPhotoCard {
-         display: none !important;
-     }
+      /* Profile mobile styles - cover photo visible on mobile */
+      #coverPhotoCard {
+          display: block !important;
+      }
 
      /* --- CONTAINER SECTIONS --- */
      .container {

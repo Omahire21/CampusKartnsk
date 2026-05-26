@@ -336,7 +336,8 @@ def kyc():
             return redirect(url_for('kyc'))
 
     kyc_record = fb.get_kyc(session['user_id'])
-    return render_template('kyc.html', kyc=kyc_record)
+    user = fb.get_user_by_id(session['user_id'])
+    return render_template('kyc.html', kyc=kyc_record, user=user)
 
 
 @app.route('/kyc/doc/<path:filename>')
@@ -427,6 +428,36 @@ def update_cover_photo():
         session['cover_photo'] = cover_url
         flash('Cover photo updated!', 'success')
     return redirect(url_for('profile'))
+
+
+@app.route('/profile/photo/ajax', methods=['POST'])
+@login_required
+def update_profile_photo_ajax():
+    prof_file = request.files.get('profile_pic')
+    if prof_file and prof_file.filename and allowed_kyc(prof_file.filename):
+        pfname = f"avatar_{unique_filename(session['user_id'], prof_file.filename)}"
+        plocal = save_local(prof_file, UPLOAD_FOLDER, pfname)
+        pu = fb.upload_file_to_storage(plocal, f"avatars/{pfname}")
+        pic_url = pu if pu else pfname
+        fb.update_user(session['user_id'], {'profile_pic': pic_url})
+        session['profile_pic'] = pic_url
+        return jsonify({'success': True, 'url': pic_url})
+    return jsonify({'success': False, 'error': 'Invalid file'})
+
+
+@app.route('/profile/cover/ajax', methods=['POST'])
+@login_required
+def update_cover_photo_ajax():
+    cover_file = request.files.get('cover_photo')
+    if cover_file and cover_file.filename and allowed_kyc(cover_file.filename):
+        cfname = f"cover_{unique_filename(session['user_id'], cover_file.filename)}"
+        clocal = save_local(cover_file, UPLOAD_FOLDER, cfname)
+        cu = fb.upload_file_to_storage(clocal, f"covers/{cfname}")
+        cover_url = cu if cu else cfname
+        fb.update_user(session['user_id'], {'cover_photo': cover_url})
+        session['cover_photo'] = cover_url
+        return jsonify({'success': True, 'url': cover_url})
+    return jsonify({'success': False, 'error': 'Invalid file'})
 
 
 @app.route('/profile/edit', methods=['POST'])
