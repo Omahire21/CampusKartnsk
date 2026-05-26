@@ -528,6 +528,8 @@ nav {
     gap: 0.5rem;
     transition: all 0.2s ease;
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 @media (hover: hover) {
@@ -561,6 +563,8 @@ nav {
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 @media (hover: hover) {
@@ -585,6 +589,8 @@ nav {
     cursor: pointer;
     white-space: nowrap;
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 @media (hover: hover) {
@@ -1045,6 +1051,7 @@ nav {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.2rem;
+        margin-bottom: 1.5rem;
     }
     
     .section-header-content h3 {
@@ -2059,8 +2066,14 @@ nav {
         border-radius: 12px;
     }
 
+    .product-image-wrapper {
+        height: 140px !important;
+    }
+
     .product-card img {
-        height: 120px;
+        height: 100% !important;
+        width: 100% !important;
+        object-fit: cover !important;
     }
 
     .product-info-modern {
@@ -2086,9 +2099,19 @@ nav {
         font-size: 1rem;
     }
 
-    .card-footer-modern a {
+    .card-footer-modern a:not(.card-chat-btn) {
         padding: 0.4rem 0.7rem !important;
         font-size: 0.75rem !important;
+    }
+
+    .card-footer-modern .card-chat-btn {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
     }
 
     /* --- PREMIUM MOBILE FOOTER --- */
