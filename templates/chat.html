@@ -88,38 +88,37 @@
                     border: 1px solid var(--border);
                     {% endif %}
                     padding: 0.55rem 0.9rem;">
-
-                    <div style="font-size: 0.62rem; font-weight: 700; opacity: 0.85; margin-bottom: 0.2rem; text-align: left;">
-                        {% if is_mine %}You{% else %}{{ receiver.username }}{% endif %}
-                    </div>
-                    <p style="font-size: 0.86rem; line-height: 1.4; margin: 0; word-break: break-word;">{{ msg.message | replace('[ADMIN]: ', '') }}</p>
-
-                    <!-- Timestamp + Tick row -->
-                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; margin-top: 0.25rem;">
-                        <span style="font-size: 0.58rem; {% if is_mine %}color: rgba(255,255,255,0.65);{% else %}color: var(--text-muted);{% endif %}">
-                            {% if msg.timestamp %}
-                                {% if msg.timestamp.strftime is defined %}{{ msg.timestamp.strftime('%H:%M') }}{% else %}{{ msg.timestamp }}{% endif %}
-                            {% endif %}
-                        </span>
-
-                        {% if is_mine %}
-                        <!-- WhatsApp-style ticks -->
-                        {% if msg.read_at %}
-                        <!-- Double blue tick = READ -->
-                        <svg width="13" height="9" viewBox="0 0 16 10" fill="none" title="Read">
-                            <path d="M1 5l3 3 5-6" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M5 5l3 3 6-7" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        {% else %}
-                        <!-- Double grey tick = DELIVERED/SENT -->
-                        <svg width="13" height="9" viewBox="0 0 16 10" fill="none" title="Delivered">
-                            <path d="M1 5l3 3 5-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M5 5l3 3 6-7" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        {% endif %}
-                        {% endif %}
-                    </div>
+                <div style="font-size: 0.62rem; font-weight: 700; opacity: 0.85; margin-bottom: 0.2rem; text-align: left;">
+                    {% if is_mine %}You{% else %}{{ receiver.username }}{% endif %}
                 </div>
+                <p style="font-size: 0.86rem; line-height: 1.4; margin: 0; word-break: break-word;">{{ msg.message | replace('[ADMIN]: ', '') }}</p>
+
+                <!-- Timestamp + Tick row -->
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; margin-top: 0.25rem;">
+                    <span style="font-size: 0.58rem; {% if is_mine %}color: rgba(255,255,255,0.65);{% else %}color: var(--text-muted);{% endif %}">
+                        {% if msg.timestamp %}
+                            {% if msg.timestamp.strftime is defined %}{{ msg.timestamp.strftime('%H:%M') }}{% else %}{{ msg.timestamp }}{% endif %}
+                        {% endif %}
+                    </span>
+
+                    {% if is_mine %}
+                    <!-- WhatsApp-style ticks -->
+                    {% if msg.read_at %}
+                    <!-- Double blue tick = READ -->
+                    <svg width="13" height="9" viewBox="0 0 16 10" fill="none" title="Read">
+                        <path d="M1 5l3 3 5-6" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 5l3 3 6-7" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {% else %}
+                    <!-- Double grey tick = DELIVERED/SENT -->
+                    <svg width="13" height="9" viewBox="0 0 16 10" fill="none" title="Delivered">
+                        <path d="M1 5l3 3 5-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 5l3 3 6-7" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
             </div>
             {% endfor %}
 
