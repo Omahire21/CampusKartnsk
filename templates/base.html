@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusKart – College Marketplace</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=12.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=12.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- Instant Navigation & Transitions -->
@@ -16,6 +16,10 @@
     <style>
         html {
             overflow-y: scroll; /* Force vertical scrollbar to prevent page shift */
+            scroll-behavior: smooth;
+        }
+        body {
+            overflow-anchor: none; /* Prevent scroll anchoring jumps */
         }
         .turbo-progress-bar {
             height: 4px;
@@ -517,6 +521,24 @@
                 }
             });
         }
+        
+        // Prevent scroll jump on link clicks
+        document.addEventListener('click', function(e) {
+            const chipLink = e.target.closest('.college-chip, .category-pill');
+            if (chipLink) {
+                // Store scroll position before navigation
+                sessionStorage.setItem('scrollPos', window.scrollY);
+            }
+        }, true);
+        
+        // Restore scroll position on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedPos = sessionStorage.getItem('scrollPos');
+            if (savedPos !== null) {
+                sessionStorage.removeItem('scrollPos');
+                // Don't restore - let the page load at top for clean navigation
+            }
+        });
     </script>
 </body>
 

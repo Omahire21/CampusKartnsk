@@ -508,12 +508,19 @@ nav {
 
 /* Chips Container */
 .chips-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    justify-content: center;
-    margin-bottom: 3rem;
-}
+        margin-top: 1.5rem !important;
+        gap: 0.6rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        overflow-anchor: none;
+        position: relative;
+        min-height: 44px;
+    }
 
 .college-chip {
     background: white;
@@ -1426,6 +1433,7 @@ nav {
     gap: 0.8rem;
     margin: 1.5rem 0 3rem;
     justify-content: center;
+    contain: layout style;
 }
 
 .college-chip {
@@ -2038,11 +2046,18 @@ nav {
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        overflow-anchor: none;
+        position: relative;
+        min-height: 44px;
     }
 
     .chips-container::-webkit-scrollbar,
     .categories-container::-webkit-scrollbar {
         display: none;
+    }
+    
+    .chips-container {
+        min-height: 44px;
     }
 
     .college-chip {
@@ -2052,6 +2067,7 @@ nav {
         /* Kill hover glow on touch devices */
         transform: none !important;
         box-shadow: none !important;
+        transition: none !important;
     }
 
     /* Prevent any hover transform on touch */
