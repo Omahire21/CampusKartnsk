@@ -2267,7 +2267,6 @@ nav {
         order: 1;
         text-align: center;
         justify-self: center;
-        width: 100%;
     }
 
     /* Legal - CENTER */
@@ -2276,18 +2275,17 @@ nav {
         order: 2;
         text-align: center;
         justify-self: center;
-        width: 100%;
     }
 
     /* Get in touch - RIGHT */
     .footer-col:nth-child(4) {
         order: 3;
-        grid-column: 1 / -1;
+        grid-column: 2;
+        grid-row: 2;
         text-align: center !important;
         padding-top: 0 !important;
         border-top: none !important;
         justify-self: center;
-        width: 100%;
     }
 
     .footer-col h3 {
