@@ -225,13 +225,15 @@
 
             <!-- Quick Links -->
             <div class="footer-col">
-                <h3>Quick Links</h3>
+                <h3 class="desktop-only-footer">Quick Links</h3>
+                <h3 class="mobile-only-block">CampusKart</h3>
                 <ul class="footer-links">
-                    <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('products') }}">Browse Shop</a></li>
-                    <li><a href="{{ url_for('add_product') }}">Sell on Item</a></li>
+                    <li class="desktop-only-footer"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="desktop-only-footer"><a href="{{ url_for('products') }}">Browse Shop</a></li>
+                    <li class="desktop-only-footer"><a href="{{ url_for('add_product') }}">Sell on Item</a></li>
                     <li><a href="{{ url_for('about') }}">Our Story</a></li>
                     <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                    <li class="mobile-only-block"><a href="{{ url_for('rules') }}">Community Rules</a></li>
                 </ul>
             </div>
 
