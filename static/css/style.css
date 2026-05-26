@@ -1036,7 +1036,7 @@ nav {
     .floating-badge.badge-2 {
         top: 45%;
         bottom: auto;
-        right: -4%;
+        right: -12%;
         animation-delay: 0.2s, 1.2s !important;
     }
 
@@ -2071,7 +2071,7 @@ nav {
         height: 140px !important;
     }
 
-    .product-card img {
+    .product-image-wrapper img {
         height: 100% !important;
         width: 100% !important;
         object-fit: cover !important;

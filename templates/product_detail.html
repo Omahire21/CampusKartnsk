@@ -3,14 +3,13 @@
 {% block content %}
 <div class="container" style="max-width: 1100px; margin: 2rem auto 5rem;">
     <!-- Breadcrumbs -->
-    <nav style="margin-bottom: 1.5rem; font-size: 0.82rem; color: var(--text-muted);">
+    <div class="breadcrumbs" style="margin-bottom: 1.5rem; font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; flex-wrap: wrap;">
         <a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">Home</a>
         <i class="fas fa-chevron-right" style="font-size: 0.6rem; margin: 0 0.5rem;"></i>
-        <a href="{{ url_for('products', category=product.category) }}" style="color: inherit; text-decoration: none;">{{
-            product.category }}</a>
+        <a href="{{ url_for('products', category=product.category) }}" style="color: inherit; text-decoration: none;">{{ product.category }}</a>
         <i class="fas fa-chevron-right" style="font-size: 0.6rem; margin: 0 0.5rem;"></i>
         <span style="color: var(--text-main);">{{ product.name }}</span>
-    </nav>
+    </div>
 
     <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: start;">
         <!-- Left: Image Gallery + Safety -->
