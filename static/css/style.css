@@ -1034,9 +1034,10 @@ nav {
     }
 
     .floating-badge.badge-2 {
-        top: 45%;
+        top: 55%;
         bottom: auto;
-        right: -12%;
+        right: -25% !important;
+        transform: scale(0.85);
         animation-delay: 0.2s, 1.2s !important;
     }
 
@@ -1442,11 +1443,13 @@ nav {
     gap: 0.5rem;
 }
 
-.college-chip:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: rgba(108, 76, 241, 0.02);
-    transform: translateY(-1px);
+@media (hover: hover) {
+    .college-chip:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(108, 76, 241, 0.02);
+        transform: translateY(-1px);
+    }
 }
 
 .college-chip.active {
@@ -2562,5 +2565,30 @@ nav {
 
     .footer-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Responsive Grid and Typography */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+}
+
+.page-hero-title {
+    font-size: 3.5rem;
+}
+
+@media (max-width: 768px) {
+    .responsive-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+    .page-hero-title {
+        font-size: 2.2rem !important;
+    }
+    .responsive-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1.5rem !important;
     }
 }

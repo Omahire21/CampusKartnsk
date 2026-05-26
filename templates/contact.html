@@ -4,12 +4,12 @@
 <div class="container" style="max-width: 1000px;">
     <div style="text-align: center; margin-bottom: 4rem;">
         <span class="badge-new">Get in Touch</span>
-        <h1 style="font-size: 3.5rem; margin-top: 1rem;">We're Here to Help</h1>
+        <h1 class="page-hero-title" style="margin-top: 1rem;">We're Here to Help</h1>
         <p style="font-size: 1.25rem; color: var(--text-muted);">Have questions about buying or selling? Our team is
             just an email away.</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;">
+    <div class="responsive-grid" style="align-items: start;">
         <div
             style="background: white; padding: 3rem; border-radius: 40px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
             <form action="{{ url_for('contact') }}" method="POST">

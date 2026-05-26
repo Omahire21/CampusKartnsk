@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusKart – College Marketplace</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=10.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=11.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- Instant Navigation & Transitions -->
@@ -398,6 +398,13 @@
             button.style.transform = 'scale(1.3)';
             setTimeout(() => button.style.transform = '', 200);
 
+            // Instant UI Toggle for perceived performance
+            let wasFavorited = false;
+            if (svg) {
+                wasFavorited = svg.getAttribute('fill') === '#ef4444';
+                svg.setAttribute('fill', wasFavorited ? 'none' : '#ef4444');
+            }
+
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -406,6 +413,8 @@
             })
             .then(response => {
                 if (response.status === 401) {
+                    // Revert UI toggle on auth error
+                    if (svg) svg.setAttribute('fill', wasFavorited ? '#ef4444' : 'none');
                     window.location.href = "{{ url_for('login') }}";
                     return;
                 }
