@@ -86,9 +86,11 @@
 
 <div class="container" style="max-width: 1440px; margin: 0 auto; padding: 2rem 5% 5rem;">
     <!-- College Chips Section -->
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">Explore Nashik Campuses</h3>
-        <p style="color: var(--text-muted); font-weight: 500;">Filter marketplace listings by your favorite local institutions</p>
+    <div class="section-header" style="justify-content: center; text-align: center; margin-bottom: 1.5rem;">
+        <div class="section-header-content">
+            <h3>Explore Nashik Campuses</h3>
+            <p>Filter marketplace listings by your favorite local institutions</p>
+        </div>
     </div>
     <div class="chips-container">
         <a href="{{ url_for('products', college='K.R.T. Arts, B.H. Commerce and A.M. Science (KTHM) College') }}" class="college-chip">🏛️ KTHM</a>
@@ -99,12 +101,12 @@
     </div>
 
     <!-- Trending Categories Section -->
-    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div>
-            <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">Trending Categories</h3>
-            <p style="color: var(--text-muted); font-weight: 500;">Browse popular items listed by fellow students</p>
+    <div class="section-header">
+        <div class="section-header-content">
+            <h3>Trending Categories</h3>
+            <p>Browse popular items listed by fellow students</p>
         </div>
-        <a href="{{ url_for('products') }}" style="color: var(--primary); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+        <a href="{{ url_for('products') }}" class="see-all-btn">
             See All <i class="fas fa-arrow-right"></i>
         </a>
     </div>
@@ -155,12 +157,12 @@
     </div>
 
     <!-- Recently Added Section -->
-    <div style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div>
-            <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">Recently Added Listings</h3>
-            <p style="color: var(--text-muted); font-weight: 500;">Fresh listings uploaded by students today</p>
+    <div class="section-header">
+        <div class="section-header-content">
+            <h3>Recently Added Listings</h3>
+            <p>Fresh listings uploaded by students today</p>
         </div>
-        <a href="{{ url_for('products') }}" style="color: var(--primary); font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem;">
+        <a href="{{ url_for('products') }}" class="see-all-btn">
             Browse All <i class="fas fa-arrow-right"></i>
         </a>
     </div>
