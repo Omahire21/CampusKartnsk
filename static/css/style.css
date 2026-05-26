@@ -332,13 +332,13 @@ nav {
 .floating-badge.badge-2 {
     bottom: 12%;
     right: -10%;
-    animation-delay: 3s;
+    animation-delay: 0s;
 }
 
 .floating-badge.badge-3 {
     bottom: -6%;
     left: 8%;
-    animation-delay: 1.5s;
+    animation-delay: 0s;
 }
 
 .floating-badge .icon-box {
@@ -826,7 +826,8 @@ nav {
 
     nav .nav-links.active {
         display: flex !important;
-        max-height: 500px !important;
+        max-height: calc(100vh - 65px) !important;
+        overflow-y: auto !important;
     }
 
     .nav-links a {
@@ -844,6 +845,47 @@ nav {
         color: var(--text-main) !important;
         flex: 1 !important;
         text-align: center !important;
+    }
+
+    /* ── Floating Badges – Mobile Size Reduction ── */
+    .floating-badge {
+        padding: 0.45rem 0.7rem;
+        gap: 0.45rem;
+        border-radius: 12px;
+    }
+
+    .floating-badge .icon-box {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        font-size: 0.7rem;
+        flex-shrink: 0;
+    }
+
+    .floating-badge .badge-text span:first-child {
+        font-size: 0.55rem;
+        letter-spacing: 0.3px;
+    }
+
+    .floating-badge .badge-text span:last-child {
+        font-size: 0.72rem;
+    }
+
+    /* Tighten badge positions so they stay within image bounds */
+    .floating-badge.badge-1 {
+        top: 2%;
+        left: -2%;
+    }
+
+    .floating-badge.badge-2 {
+        top: 45%;
+        bottom: auto;
+        right: -4%;
+    }
+
+    .floating-badge.badge-3 {
+        bottom: 2%;
+        left: 4%;
     }
 }
 
