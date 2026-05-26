@@ -764,6 +764,7 @@ def get_leaderboard(limit=20):
             'college': u.get('college'),
             'deals': deals,
             'active': active,
+            'mck_id': u.get('mck_id'),
         })
 
     board.sort(key=lambda x: (-x['deals'], -x['active']))
