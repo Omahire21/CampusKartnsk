@@ -4,7 +4,7 @@
 <div style="max-width: 860px; margin: 0 auto; padding: 1.5rem 1.5rem 2rem;">
 
     <!-- Back Button -->
-    <div style="margin-bottom: 1.2rem;">
+    <div style="margin-bottom: 1.2rem;" class="chat-back-desktop">
         {% if product_id == '0' or product_id == 0 %}
         <a href="{{ url_for('my_chats') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.88rem; padding: 0.45rem 1rem; background: white; border: 1.5px solid var(--border); border-radius: 50px; transition: all 0.2s;"
            onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
@@ -21,34 +21,40 @@
         </a>
         {% endif %}
     </div>
+    
+    <style>
+    @media (max-width: 768px) {
+        .chat-back-desktop {
+            display: none !important;
+        }
+    }
+    </style>
 
     <!-- Chat Window -->
     <div style="background: white; border: 1.5px solid var(--border); border-radius: 28px; overflow: hidden; box-shadow: 0 8px 32px rgba(108,76,241,0.08);">
 
         <!-- Chat Header -->
-        <div style="background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%); padding: 1.2rem 1.8rem; display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: white; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.4);">
+        <div style="background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%); padding: 1.2rem 1.2rem; display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: white; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.4);">
                 {{ receiver.username[0]|upper if receiver.username else '?' }}
             </div>
             <div style="flex: 1;">
                 <div style="font-size: 1rem; font-weight: 800; color: white;">{{ receiver.username }}</div>
-                <div id="presenceSubtitle" style="font-size: 0.78rem; color: rgba(255,255,255,0.75); margin-top: 2px; display: flex; align-items: center; gap: 0.4rem; transition: all 0.4s;">
+                <div id="presenceSubtitle" style="font-size: 0.72rem; color: rgba(255,255,255,0.75); margin-top: 2px; display: flex; align-items: center; gap: 0.4rem; transition: all 0.4s;">
                     <span id="presenceDot" style="width: 7px; height: 7px; background: rgba(255,255,255,0.3); border-radius: 50%; display: inline-block; flex-shrink: 0; transition: all 0.4s;"></span>
                     <span id="presenceText">Connecting...</span>
                 </div>
             </div>
             {% if product and product.name and product_id != '0' and product_id != 0 %}
             <a href="{{ url_for('product_detail', product_id=product_id) }}"
-               style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); padding: 0.4rem 0.9rem; border-radius: 50px; text-decoration: none; color: white; font-size: 0.78rem; font-weight: 700; transition: all 0.2s;"
-               onmouseover="this.style.background='rgba(255,255,255,0.28)'"
-               onmouseout="this.style.background='rgba(255,255,255,0.18)'">
-                <img src="{{ url_for('static', filename='chat-box.png') }}" width="14" height="14" style="vertical-align: middle; filter: brightness(0) invert(1);"> {{ product.name[:20] }}{% if product.name|length > 20 %}…{% endif %}
+               style="display: flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); padding: 0.35rem 0.7rem; border-radius: 50px; text-decoration: none; color: white; font-size: 0.72rem; font-weight: 700; transition: all 0.2s; max-width: 45%;">
+                <img src="{{ url_for('static', filename='chat-box.png') }}" width="12" height="12" style="vertical-align: middle; filter: brightness(0) invert(1);"> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ product.name[:15] }}{% if product.name|length > 15 %}…{% endif %}</span>
             </a>
             {% endif %}
         </div>
 
         <!-- Messages Area -->
-        <div id="chatMessages" style="min-height: 400px; max-height: 500px; overflow-y: auto; padding: 1.5rem 1.8rem; background: #f6f5fb; display: flex; flex-direction: column; gap: 0.6rem; scroll-behavior: smooth;">
+        <div id="chatMessages" style="min-height: 400px; max-height: 500px; overflow-y: auto; padding: 1.2rem 1.2rem; background: #f6f5fb; display: flex; flex-direction: column; gap: 0.5rem; scroll-behavior: smooth;">
 
             <!-- Date separator -->
             <div style="text-align: center; margin: 0.5rem 0;">
@@ -58,38 +64,38 @@
             {% if messages %}
             {% for msg in messages %}
             {% set is_mine = msg.sender_id == my_id %}
-            <div style="display: flex; justify-content: {% if is_mine %}flex-end{% else %}flex-start{% endif %}; align-items: flex-end; gap: 0.4rem;">
+            <div style="display: flex; justify-content: {% if is_mine %}flex-end{% else %}flex-start{% endif %}; align-items: flex-end; gap: 0.3rem;">
 
                 {% if not is_mine %}
                 <!-- Receiver avatar dot -->
-                <div style="width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #6C4CF1, #8B5CF6); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: white; flex-shrink: 0; margin-bottom: 2px;">
+                <div style="width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #6C4CF1, #8B5CF6); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; color: white; flex-shrink: 0; margin-bottom: 2px;">
                     {{ receiver.username[0]|upper if receiver.username else '?' }}
                 </div>
                 {% endif %}
 
-                <div style="max-width: 68%;
+                <div style="max-width: 72%;
                     {% if is_mine %}
                     background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%);
                     color: white;
-                    border-radius: 18px 18px 4px 18px;
-                    box-shadow: 0 3px 10px rgba(108,76,241,0.22);
+                    border-radius: 16px 16px 4px 16px;
+                    box-shadow: 0 2px 8px rgba(108,76,241,0.18);
                     {% else %}
                     background: white;
                     color: var(--text-main);
-                    border-radius: 18px 18px 18px 4px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                    border-radius: 16px 16px 16px 4px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
                     border: 1px solid var(--border);
                     {% endif %}
-                    padding: 0.65rem 1rem;">
+                    padding: 0.55rem 0.9rem;">
 
-                    <div style="font-size: 0.68rem; font-weight: 700; opacity: 0.85; margin-bottom: 0.3rem; text-align: left;">
+                    <div style="font-size: 0.62rem; font-weight: 700; opacity: 0.85; margin-bottom: 0.2rem; text-align: left;">
                         {% if is_mine %}You{% else %}{{ receiver.username }}{% endif %}
                     </div>
-                    <p style="font-size: 0.91rem; line-height: 1.5; margin: 0; word-break: break-word;">{{ msg.message | replace('[ADMIN]: ', '') }}</p>
+                    <p style="font-size: 0.86rem; line-height: 1.4; margin: 0; word-break: break-word;">{{ msg.message | replace('[ADMIN]: ', '') }}</p>
 
                     <!-- Timestamp + Tick row -->
-                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-top: 0.35rem;">
-                        <span style="font-size: 0.62rem; {% if is_mine %}color: rgba(255,255,255,0.65);{% else %}color: var(--text-muted);{% endif %}">
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; margin-top: 0.25rem;">
+                        <span style="font-size: 0.58rem; {% if is_mine %}color: rgba(255,255,255,0.65);{% else %}color: var(--text-muted);{% endif %}">
                             {% if msg.timestamp %}
                                 {% if msg.timestamp.strftime is defined %}{{ msg.timestamp.strftime('%H:%M') }}{% else %}{{ msg.timestamp }}{% endif %}
                             {% endif %}
@@ -99,15 +105,15 @@
                         <!-- WhatsApp-style ticks -->
                         {% if msg.read_at %}
                         <!-- Double blue tick = READ -->
-                        <svg width="16" height="10" viewBox="0 0 16 10" fill="none" title="Read">
-                            <path d="M1 5l3 3 5-6" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M5 5l3 3 6-7" stroke="#93c5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <svg width="13" height="9" viewBox="0 0 16 10" fill="none" title="Read">
+                            <path d="M1 5l3 3 5-6" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 5l3 3 6-7" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         {% else %}
                         <!-- Double grey tick = DELIVERED/SENT -->
-                        <svg width="16" height="10" viewBox="0 0 16 10" fill="none" title="Delivered">
-                            <path d="M1 5l3 3 5-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M5 5l3 3 6-7" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <svg width="13" height="9" viewBox="0 0 16 10" fill="none" title="Delivered">
+                            <path d="M1 5l3 3 5-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 5l3 3 6-7" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         {% endif %}
                         {% endif %}
@@ -117,11 +123,11 @@
             {% endfor %}
 
             {% else %}
-            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3.5rem 1rem; text-align: center; gap: 1rem;">
-                <img src="{{ url_for('static', filename='chat-box.png') }}" width="50" height="50" style="opacity: 0.8;">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1rem; text-align: center; gap: 1rem;">
+                <img src="{{ url_for('static', filename='chat-box.png') }}" width="45" height="45" style="opacity: 0.8;">
                 <div>
-                    <div style="font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 0.3rem;">No messages yet</div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">Say hello to {{ receiver.username }}!</div>
+                    <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.3rem;">No messages yet</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Say hello to {{ receiver.username }}!</div>
                 </div>
             </div>
             {% endif %}
@@ -129,23 +135,23 @@
 
         <!-- Message Input -->
         <form action="{{ url_for('chat', product_id=product_id, receiver_id=receiver_id) }}" method="POST"
-              style="padding: 1rem 1.4rem; border-top: 1.5px solid var(--border); background: white; display: flex; gap: 0.7rem; align-items: center;">
+              style="padding: 0.8rem 1rem; border-top: 1.5px solid var(--border); background: white; display: flex; gap: 0.6rem; align-items: center;" id="chatForm">
 
             <input type="text" name="message" id="messageInput"
                    placeholder="Type a message..."
                    required autocomplete="off"
-                   style="flex: 1; border: 1.5px solid var(--border); border-radius: 50px; padding: 0.75rem 1.3rem; font-size: 0.92rem; font-family: inherit; font-weight: 500; outline: none; background: #f6f5fb; transition: all 0.2s; color: var(--text-main);"
+                   style="flex: 1; border: 1.5px solid var(--border); border-radius: 50px; padding: 0.65rem 1.1rem; font-size: 0.88rem; font-family: inherit; font-weight: 500; outline: none; background: #f6f5fb; transition: all 0.2s; color: var(--text-main);"
                    onfocus="this.style.borderColor='var(--primary)';this.style.background='white';this.style.boxShadow='0 0 0 3px rgba(108,76,241,0.08)'"
                    onblur="this.style.borderColor='var(--border)';this.style.background='#f6f5fb';this.style.boxShadow='none'">
 
-            <!-- Telegram-style Send Button -->
+            <!-- Instant Send Button -->
             <button type="submit" id="sendBtn"
-                    style="background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%); color: white; border: none; border-radius: 50%; width: 46px; height: 46px; min-width: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 14px rgba(108,76,241,0.35); transition: all 0.2s; position: relative; overflow: hidden;"
-                    onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 20px rgba(108,76,241,0.5)'"
-                    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 14px rgba(108,76,241,0.35)'"
+                    style="background: linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; min-width: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 3px 12px rgba(108,76,241,0.28); transition: all 0.2s;"
+                    onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 4px 16px rgba(108,76,241,0.35)'"
+                    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 3px 12px rgba(108,76,241,0.28)'"
                     title="Send">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
-                     fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" 
+                     fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send">
                     <path d="m22 2-7 20-4-9-9-4Z"></path>
                     <path d="M22 2 11 13"></path>
                 </svg>
@@ -166,13 +172,27 @@
     const chatBox = document.getElementById('chatMessages');
     if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Enter to send
+    // Enter to send (instant submit)
     const msgInput = document.getElementById('messageInput');
+    const chatForm = document.getElementById('chatForm');
     if (msgInput) {
         msgInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                this.closest('form').submit();
+                if (this.value.trim()) {
+                    chatForm.submit();
+                }
+            }
+        });
+    }
+
+    // Instant send on button click
+    const sendBtn = document.getElementById('sendBtn');
+    if (sendBtn && chatForm) {
+        sendBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (msgInput && msgInput.value.trim()) {
+                chatForm.submit();
             }
         });
     }
