@@ -511,7 +511,6 @@ nav {
 .college-chip:hover {
     border-color: var(--primary);
     color: var(--primary);
-    transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -544,7 +543,6 @@ nav {
     .category-pill:hover {
         border-color: var(--primary);
         color: var(--primary);
-        transform: translateY(-2px);
     }
 }
 
@@ -569,7 +567,6 @@ nav {
     .category-pill-view-all:hover {
         border-color: var(--primary);
         color: var(--primary);
-        transform: translateY(-2px);
     }
 }
 
