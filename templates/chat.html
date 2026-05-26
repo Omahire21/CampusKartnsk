@@ -47,8 +47,9 @@
             </div>
             {% if product and product.name and product_id != '0' and product_id != 0 %}
             <a href="{{ url_for('product_detail', product_id=product_id) }}"
-               style="display: flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); padding: 0.35rem 0.7rem; border-radius: 50px; text-decoration: none; color: white; font-size: 0.72rem; font-weight: 700; transition: all 0.2s; max-width: 45%;">
-                <img src="{{ url_for('static', filename='chat-box.png') }}" width="12" height="12" style="vertical-align: middle; filter: brightness(0) invert(1);"> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ product.name[:15] }}{% if product.name|length > 15 %}…{% endif %}</span>
+               style="display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); width: 36px; height: 36px; border-radius: 50%; text-decoration: none; color: white; font-size: 0.9rem; font-weight: 700; transition: all 0.2s;"
+               title="View Product">
+                <i class="fas fa-box"></i>
             </a>
             {% endif %}
         </div>
