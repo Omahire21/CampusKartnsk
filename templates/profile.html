@@ -31,12 +31,12 @@
 
     <!-- Cover Photo Section -->
     <div class="profile-header-card" id="coverPhotoCard" style="padding: 0; margin-bottom: 1.5rem; overflow: hidden;">
-        <div style="position: relative; height: 120px; background: {% if user.cover_photo %}url({{ url_for('uploaded_file', filename=user.cover_photo) }}) center/cover{% else %}linear-gradient(135deg, #6366f1, #8b5cf6){% endif %};">
+        <div style="position: relative; height: 120px; background: {% if session.get('cover_photo') %}url({{ url_for('uploaded_file', filename=session.get('cover_photo')) }}) center/cover{% else %}linear-gradient(135deg, #6366f1, #8b5cf6){% endif %};" id="coverPhotoPreview">
             <label for="coverPhotoUpdate" style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.9); padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                 <i class="fas fa-camera"></i> Change Cover
             </label>
             <form id="coverPhotoForm" action="{{ url_for('update_cover_photo') }}" method="POST" enctype="multipart/form-data" style="display:none;">
-                <input type="file" id="coverPhotoUpdate" name="cover_photo" accept="image/*" onchange="document.getElementById('coverPhotoForm').submit()">
+                <input type="file" id="coverPhotoUpdate" name="cover_photo" accept="image/*" onchange="previewCoverPhoto(event)">
             </form>
         </div>
     </div>
@@ -509,17 +509,58 @@
         }
     }
 
+    // Instant preview for profile photo upload
+    const profileInput = document.getElementById('profileImageUpdate');
+    if (profileInput) {
+        profileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const avatar = document.querySelector('.profile-avatar > label');
+                    const existingImg = avatar.querySelector('img');
+                    const fallbackSpan = avatar.querySelector('span');
+                    
+                    if (existingImg) {
+                        existingImg.src = ev.target.result;
+                    } else {
+                        const img = document.createElement('img');
+                        img.src = ev.target.result;
+                        img.style = 'width: 100%; height: 100%; object-fit: cover;';
+                        if (fallbackSpan) fallbackSpan.style.display = 'none';
+                        avatar.appendChild(img);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Instant preview for cover photo upload
+    function previewCoverPhoto(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const coverDiv = document.getElementById('coverPhotoPreview');
+                if (coverDiv) {
+                    coverDiv.style.background = `url(${ev.target.result}) center/cover`;
+                }
+            };
+            reader.readAsDataURL(file);
+            setTimeout(() => document.getElementById('coverPhotoForm').submit(), 100);
+        }
+    }
+
     // Monitor changes for Save button
     document.addEventListener('turbo:load', () => {
         const form = document.getElementById('profileUpdateForm');
         if (form) {
-            // Store initial values of all inputs
             const initialValues = {};
             Array.from(form.elements).forEach(el => {
                 if(el.name) initialValues[el.name] = el.value;
             });
 
-            // Prevent stacking event listeners on multiple turbo loads
             const newForm = form.cloneNode(true);
             form.parentNode.replaceChild(newForm, form);
 

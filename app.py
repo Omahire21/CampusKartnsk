@@ -196,6 +196,7 @@ def login():
             session['college']    = user['college']
             session['is_admin']   = user.get('is_admin', False)
             session['profile_pic']= user.get('profile_pic', '')
+            session['cover_photo']= user.get('cover_photo', '')
             kyc = fb.get_kyc(user['id'])
             session['kyc_status'] = kyc['status'] if kyc else 'not_submitted'
             flash(f"Welcome back, {user['username']}!", 'success')
@@ -407,6 +408,7 @@ def update_profile_photo():
         pu = fb.upload_file_to_storage(plocal, f"avatars/{pfname}")
         pic_url = pu if pu else pfname
         fb.update_user(session['user_id'], {'profile_pic': pic_url})
+        # Update session immediately
         session['profile_pic'] = pic_url
         flash('Profile photo updated!', 'success')
     return redirect(url_for('profile'))
@@ -422,6 +424,7 @@ def update_cover_photo():
         cu = fb.upload_file_to_storage(clocal, f"covers/{cfname}")
         cover_url = cu if cu else cfname
         fb.update_user(session['user_id'], {'cover_photo': cover_url})
+        session['cover_photo'] = cover_url
         flash('Cover photo updated!', 'success')
     return redirect(url_for('profile'))
 
