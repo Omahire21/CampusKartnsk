@@ -2049,6 +2049,26 @@ nav {
         padding: 0.4rem 0.9rem;
         font-size: 0.82rem;
         white-space: nowrap;
+        /* Kill hover glow on touch devices */
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Prevent any hover transform on touch */
+    .college-chip:hover,
+    .college-chip:focus {
+        transform: none !important;
+        border-color: var(--border) !important;
+        color: var(--text-main) !important;
+        background: white !important;
+        box-shadow: none !important;
+    }
+
+    .college-chip.active:hover,
+    .college-chip.active:focus {
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        color: white !important;
     }
 
     /* --- NAVBAR (handled by menu toggle) --- */
@@ -2223,9 +2243,10 @@ nav {
 
     .footer-links a,
     .footer-contact li {
-        font-size: 0.85rem;
-        margin-bottom: 0.4rem;
-        line-height: 1.4;
+        font-size: 0.88rem;
+        margin-bottom: 0.65rem;
+        line-height: 1.5;
+        padding: 0.15rem 0;
     }
 
     .footer-contact li {

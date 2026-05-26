@@ -41,7 +41,8 @@
         </div>
 
         <!-- Glassmorphism Filter & Search Form -->
-        <form action="{{ url_for('products') }}" method="GET" class="products-filter-form" style="display: flex; gap: 0.4rem; flex-wrap: nowrap; align-items: center; width: 100%;">
+        <!-- DESKTOP: full inline form -->
+        <form action="{{ url_for('products') }}" method="GET" class="products-filter-form desktop-filter-form" style="display: flex; gap: 0.4rem; flex-wrap: nowrap; align-items: center; width: 100%;">
             <div class="form-group search-group" style="margin: 0; min-width: 0; flex: 1 1 0; position: relative;" id="searchWrapper">
                 <!-- Inline SVG magnifier - always renders -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -93,6 +94,88 @@
                 Clear
             </a>
         </form>
+
+        <!-- MOBILE: Search + Filter button only -->
+        <div class="mobile-search-bar" style="display: none; width: 100%; gap: 0.5rem; align-items: center; flex-wrap: nowrap;">
+            <div style="position: relative; flex: 1; min-width: 0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                     stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                     style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 2;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="mobileSearchInput" placeholder="Search products..."
+                       value="{{ request.args.get('search', '') }}"
+                       autocomplete="off"
+                       style="padding-left: 2.2rem; background: white; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.9rem; font-weight: 500; height: 42px; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            </div>
+            <button onclick="openFilterDrawer()" type="button"
+                    style="height: 42px; padding: 0 1rem; border-radius: 12px; background: var(--primary); color: white; border: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(108,76,241,0.25); -webkit-tap-highlight-color: transparent;">
+                <i class="fas fa-sliders-h"></i> Filters
+                {% if request.args.get('category') or request.args.get('college') %}
+                <span style="background: white; color: var(--primary); border-radius: 50%; width: 18px; height: 18px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">
+                    {{ (1 if request.args.get('category') else 0) + (1 if request.args.get('college') else 0) }}
+                </span>
+                {% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- MOBILE Filter Drawer Overlay -->
+    <div id="filterOverlay" onclick="closeFilterDrawer()" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; backdrop-filter: blur(2px);"></div>
+
+    <!-- MOBILE Filter Drawer -->
+    <div id="filterDrawer" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 24px 24px 0 0; padding: 1.5rem 1.5rem 2.5rem; z-index: 1001; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);">
+        <div style="width: 40px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 0 auto 1.5rem;"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0;">Filter Products</h3>
+            <button onclick="closeFilterDrawer()" style="background: #f1f5f9; border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; -webkit-tap-highlight-color: transparent;">✕</button>
+        </div>
+        <form action="{{ url_for('products') }}" method="GET" id="mobileFilterForm">
+            <input type="hidden" name="search" id="drawerSearchValue" value="{{ request.args.get('search', '') }}">
+            
+            <div style="margin-bottom: 1.2rem;">
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; display: block;">Category</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for cat in ['Books', 'Electronics', 'Calculators', 'Stationery', 'Hostel'] %}
+                    <label style="cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                        <input type="radio" name="category" value="{{ cat }}" style="display: none;"
+                               {% if request.args.get('category') == cat %}checked{% endif %}
+                               onchange="this.form.submit()">
+                        <span class="drawer-filter-pill {% if request.args.get('category') == cat %}active{% endif %}"
+                              style="display: inline-block; padding: 0.45rem 1rem; border-radius: 50px; border: 1.5px solid {% if request.args.get('category') == cat %}var(--primary){% else %}var(--border){% endif %}; background: {% if request.args.get('category') == cat %}var(--primary){% else %}white{% endif %}; color: {% if request.args.get('category') == cat %}white{% else %}var(--text-main){% endif %}; font-weight: 600; font-size: 0.88rem; transition: all 0.2s;">
+                            {{ cat }}
+                        </span>
+                    </label>
+                    {% endfor %}
+                    <label style="cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                        <input type="radio" name="category" value="" style="display: none;"
+                               {% if not request.args.get('category') %}checked{% endif %}
+                               onchange="this.form.submit()">
+                        <span style="display: inline-block; padding: 0.45rem 1rem; border-radius: 50px; border: 1.5px solid {% if not request.args.get('category') %}var(--primary){% else %}var(--border){% endif %}; background: {% if not request.args.get('category') %}var(--primary){% else %}white{% endif %}; color: {% if not request.args.get('category') %}white{% else %}var(--text-main){% endif %}; font-weight: 600; font-size: 0.88rem;">
+                            All
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; display: block;">College</label>
+                <select name="college" style="width: 100%; border-radius: 12px; border: 1.5px solid var(--border); font-size: 0.9rem; font-weight: 600; height: 44px; padding: 0 1rem; background: white;" onchange="this.form.submit()">
+                    <option value="">All Colleges</option>
+                    {% for college in colleges %}
+                    <option value="{{ college }}" {% if current_college==college %}selected{% endif %}>
+                        {{ college.split('(')[0].strip() }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem;">
+                <button type="submit" class="btn-primary" style="flex: 1; height: 46px; border-radius: 12px; font-size: 0.95rem;">Apply Filters</button>
+                <a href="{{ url_for('products') }}" style="flex: 1; height: 46px; border-radius: 12px; background: #f1f5f9; color: var(--text-main); font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">Reset</a>
+            </div>
+        </form>
     </div>
 
     <!-- Product Grid -->
@@ -133,7 +216,9 @@
             <!-- Content Section -->
             <div class="product-info-modern">
                 <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; height: 2.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
-                    {{ product.name }}
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}" style="color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent;">
+                        {{ product.name }}
+                    </a>
                 </h4>
                 
                 <div class="product-college-meta">
@@ -285,10 +370,67 @@
 
     // Close on outside click
     document.addEventListener('click', function(e) {
-        if (!document.getElementById('searchWrapper').contains(e.target)) {
+        const wrapper = document.getElementById('searchWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
             closeDropdown();
         }
     });
+})();
+</script>
+
+<script>
+// ── Mobile Filter Drawer ───────────────────────────────────────────────────
+function openFilterDrawer() {
+    const overlay = document.getElementById('filterOverlay');
+    const drawer = document.getElementById('filterDrawer');
+    if (!overlay || !drawer) return;
+    overlay.style.display = 'block';
+    drawer.style.display = 'block';
+    // Update hidden search value from mobile input
+    const mobileInput = document.getElementById('mobileSearchInput');
+    const drawerVal = document.getElementById('drawerSearchValue');
+    if (mobileInput && drawerVal) drawerVal.value = mobileInput.value;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => { drawer.style.transform = 'translateY(0)'; });
+    });
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFilterDrawer() {
+    const overlay = document.getElementById('filterOverlay');
+    const drawer = document.getElementById('filterDrawer');
+    if (!overlay || !drawer) return;
+    drawer.style.transform = 'translateY(100%)';
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        drawer.style.display = 'none';
+    }, 350);
+    document.body.style.overflow = '';
+}
+
+// Mobile search — submit on Enter
+(function() {
+    const mInput = document.getElementById('mobileSearchInput');
+    if (!mInput) return;
+    mInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            window.location.href = '/products?search=' + encodeURIComponent(this.value.trim());
+        }
+    });
+})();
+
+// ── Responsive: show/hide correct filter UI based on screen size ───────────
+(function() {
+    const desktopForm = document.querySelector('.desktop-filter-form');
+    const mobileBar   = document.querySelector('.mobile-search-bar');
+    function applyLayout() {
+        const isMobile = window.innerWidth <= 768;
+        if (desktopForm) desktopForm.style.display = isMobile ? 'none' : 'flex';
+        if (mobileBar)   mobileBar.style.display   = isMobile ? 'flex' : 'none';
+    }
+    applyLayout();
+    window.addEventListener('resize', applyLayout);
 })();
 </script>
 {% endblock %}
