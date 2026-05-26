@@ -2026,6 +2026,7 @@ nav {
     /* College chips & Categories */
     .chips-container,
     .categories-container {
+        margin-top: 1.5rem !important;
         gap: 0.6rem;
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -2112,6 +2113,30 @@ nav {
         align-items: center !important;
         justify-content: center !important;
         border-radius: 50% !important;
+        font-size: 1rem !important; /* Fix massive icon */
+    }
+
+    /* Fix overlapping tags and buttons on mobile cards */
+    .card-badge-container {
+        top: 8px !important;
+        left: 8px !important;
+    }
+
+    .condition-tag {
+        font-size: 0.55rem !important;
+        padding: 0.25rem 0.5rem !important;
+        letter-spacing: 0.2px;
+    }
+
+    .wishlist-btn-modern {
+        width: 28px !important;
+        height: 28px !important;
+        top: 8px !important;
+        right: 8px !important;
+    }
+    
+    .wishlist-btn-modern i {
+        font-size: 0.75rem !important;
     }
 
     /* --- PREMIUM MOBILE FOOTER --- */
