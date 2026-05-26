@@ -524,10 +524,10 @@
         }
         
         // Set active nav item based on current path
-        window.addEventListener('DOMContentLoaded', function() {
+        function setActiveNav() {
             const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-icon-link');
-            navLinks.forEach(link => {
+            document.querySelectorAll('.nav-icon-link').forEach(link => {
+                link.classList.remove('nav-active');
                 const href = link.getAttribute('href');
                 if (href && (currentPath === href || 
                     (href.includes('/profile') && currentPath.startsWith('/profile')) ||
@@ -541,7 +541,10 @@
                     link.classList.add('nav-active');
                 }
             });
-        });
+        }
+        
+        window.addEventListener('DOMContentLoaded', setActiveNav);
+        document.addEventListener('turbo:load', setActiveNav);
 
         // Prevent scroll jump on link clicks
         document.addEventListener('click', function(e) {
