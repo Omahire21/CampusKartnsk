@@ -93,6 +93,13 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
+@app.after_request
+def no_cache(response):
+    if request.path.startswith('/admin') or request.path == '/login' or request.path == '/register':
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+    return response
+
 # ── College list ───────────────────────────────────────────────────────────────
 NASHIK_COLLEGES = sorted([
     "K.R.T. Arts, B.H. Commerce and A.M. Science (KTHM) College",
