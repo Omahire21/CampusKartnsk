@@ -604,6 +604,23 @@ def my_chats():
     return render_template('my_chats.html', conversations=convs)
 
 
+@app.route('/chat/<string:product_id>/<string:receiver_id>/ajax', methods=['POST'])
+@login_required
+def chat_ajax(product_id, receiver_id):
+    if session.get('is_admin'):
+        return jsonify({'status': 'error', 'message': 'Admin cannot send messages this way'}), 403
+
+    user_id = session['user_id']
+    real_pid = None if product_id == '0' else product_id
+
+    message = request.json.get('message', '').strip()
+    if not message:
+        return jsonify({'status': 'error', 'message': 'Empty message'}), 400
+
+    fb.send_message(user_id, session['username'], receiver_id, message, real_pid)
+    return jsonify({'status': 'success'})
+
+
 @app.route('/chat/<string:product_id>/<string:receiver_id>', methods=['GET', 'POST'])
 @login_required
 def chat(product_id, receiver_id):

@@ -172,34 +172,170 @@
     const chatBox = document.getElementById('chatMessages');
     if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Enter to send (instant submit)
+    // AJAX Message Sending - Instant send without page refresh
     const msgInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
     const chatForm = document.getElementById('chatForm');
+    const productId = "{{ product_id }}";
+    const receiverId = "{{ receiver_id }}";
+    const myId = "{{ my_id }}";
+    const receiverName = "{{ receiver.username }}";
+
+    function addMessageToUI(text, isMine = true) {
+        const msgDiv = document.createElement('div');
+        msgDiv.style.display = 'flex';
+        msgDiv.style.justifyContent = isMine ? 'flex-end' : 'flex-start';
+        msgDiv.style.alignItems = 'flex-end';
+        msgDiv.style.gap = '0.3rem';
+
+        const bubble = document.createElement('div');
+        bubble.style.maxWidth = '72%';
+        bubble.style.background = isMine ? 'linear-gradient(135deg, #6C4CF1 0%, #8B5CF6 100%)' : 'white';
+        bubble.style.color = isMine ? 'white' : 'var(--text-main)';
+        bubble.style.borderRadius = isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px';
+        bubble.style.padding = '0.55rem 0.9rem';
+        bubble.style.boxShadow = isMine ? '0 2px 8px rgba(108,76,241,0.18)' : '0 1px 4px rgba(0,0,0,0.04)';
+        bubble.style.border = isMine ? 'none' : '1px solid var(--border)';
+
+        const senderLabel = document.createElement('div');
+        senderLabel.style.fontSize = '0.62rem';
+        senderLabel.style.fontWeight = '700';
+        senderLabel.style.opacity = '0.85';
+        senderLabel.style.marginBottom = '0.2rem';
+        senderLabel.style.textAlign = 'left';
+        senderLabel.textContent = isMine ? 'You' : receiverName;
+
+        const content = document.createElement('p');
+        content.style.fontSize = '0.86rem';
+        content.style.lineHeight = '1.4';
+        content.style.margin = '0';
+        content.style.wordBreak = 'break-word';
+        content.textContent = text;
+
+        const timeDiv = document.createElement('div');
+        timeDiv.style.display = 'flex';
+        timeDiv.style.alignItems = 'center';
+        timeDiv.style.justifyContent = 'flex-end';
+        timeDiv.style.gap = '0.25rem';
+        timeDiv.style.marginTop = '0.25rem';
+
+        const timeSpan = document.createElement('span');
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        timeSpan.style.fontSize = '0.58rem';
+        timeSpan.style.color = isMine ? 'rgba(255,255,255,0.65)' : 'var(--text-muted)';
+        timeSpan.textContent = `${hours}:${mins}`;
+
+        bubble.appendChild(senderLabel);
+        bubble.appendChild(content);
+        timeDiv.appendChild(timeSpan);
+        bubble.appendChild(timeDiv);
+
+        if (isMine) {
+            const tickSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            tickSvg.setAttribute('width', '13');
+            tickSvg.setAttribute('height', '9');
+            tickSvg.setAttribute('viewBox', '0 0 16 10');
+            tickSvg.setAttribute('fill', 'none');
+            tickSvg.setAttribute('title', 'Sent');
+            const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path1.setAttribute('d', 'M1 5l3 3 5-6');
+            path1.setAttribute('stroke', 'rgba(255,255,255,0.6)');
+            path1.setAttribute('stroke-width', '1.6');
+            path1.setAttribute('stroke-linecap', 'round');
+            path1.setAttribute('stroke-linejoin', 'round');
+            const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path2.setAttribute('d', 'M5 5l3 3 6-7');
+            path2.setAttribute('stroke', 'rgba(255,255,255,0.6)');
+            path2.setAttribute('stroke-width', '1.6');
+            path2.setAttribute('stroke-linecap', 'round');
+            path2.setAttribute('stroke-linejoin', 'round');
+            tickSvg.appendChild(path1);
+            tickSvg.appendChild(path2);
+            timeDiv.appendChild(tickSvg);
+        }
+
+        msgDiv.appendChild(bubble);
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = msgInput.value.trim();
+        if (!message) return;
+
+        // Clear input immediately for better UX
+        msgInput.value = '';
+        msgInput.disabled = true;
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = '0.6';
+
+        // Add message to UI instantly
+        addMessageToUI(message, true);
+
+        try {
+            const response = await fetch(`/chat/${productId}/${receiverId}/ajax`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            if (data.status !== 'success') {
+                showToast('Failed to send. Please try again.', true);
+            }
+        } catch (err) {
+            console.error('Send error:', err);
+            showToast('Network error. Message may not be sent.', true);
+        }
+
+        msgInput.disabled = false;
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+        msgInput.focus();
+    }
+
+    // Enter key to send
     if (msgInput) {
         msgInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 if (this.value.trim()) {
-                    chatForm.submit();
+                    sendMessage();
                 }
             }
         });
     }
 
-    // Instant send on button click
-    const sendBtn = document.getElementById('sendBtn');
-    if (sendBtn && chatForm) {
+    // Send button click
+    if (sendBtn) {
         sendBtn.addEventListener('click', function(e) {
             e.preventDefault();
             if (msgInput && msgInput.value.trim()) {
-                chatForm.submit();
+                sendMessage();
             }
         });
     }
 
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: ${isError ? '#ef4444' : '#1e293b'}; color: white; padding: 12px 24px;
+            border-radius: 50px; font-weight: 600; font-size: 0.85rem; z-index: 10001;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 1; transition: opacity 0.3s;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
     // ── Presence System ─────────────────────────────────────────────────────
-    const receiverId = "{{ receiver_id | safe }}";
-    const dot  = document.getElementById('presenceDot');
+    const dot = document.getElementById('presenceDot');
     const text = document.getElementById('presenceText');
 
     function pingPresence() {
@@ -213,14 +349,14 @@
                 if (!dot || !text) return;
                 if (data.online) {
                     dot.style.background = '#4ade80';
-                    dot.style.boxShadow  = '0 0 0 2px rgba(74,222,128,0.35)';
-                    text.textContent     = 'Online';
-                    text.style.color     = 'rgba(255,255,255,0.95)';
+                    dot.style.boxShadow = '0 0 0 2px rgba(74,222,128,0.35)';
+                    text.textContent = 'Online';
+                    text.style.color = 'rgba(255,255,255,0.95)';
                 } else {
                     dot.style.background = 'rgba(255,255,255,0.3)';
-                    dot.style.boxShadow  = 'none';
-                    text.textContent     = data.last_seen ? 'Last seen ' + data.last_seen.slice(11,16) : 'Offline';
-                    text.style.color     = 'rgba(255,255,255,0.6)';
+                    dot.style.boxShadow = 'none';
+                    text.textContent = data.last_seen ? 'Last seen ' + data.last_seen.slice(11,16) : 'Offline';
+                    text.style.color = 'rgba(255,255,255,0.6)';
                 }
             })
             .catch(() => { if(text) text.textContent = 'Offline'; });
