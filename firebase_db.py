@@ -78,6 +78,7 @@ def create_user(email, password, username, college):
         'batch': '',
         'hostel': '',
         'profile_pic': '',
+        'cover_photo': '',
         'mck_id': mck_id,
         'verification_status': 'not_submitted',
         'created_at': datetime.utcnow(),

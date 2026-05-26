@@ -5,6 +5,7 @@
 
     <div id="mainProfileHeader" style="display: flex; align-items: center; margin-bottom: 2rem;">
         <a href="{{ url_for('index') }}"
+            class="profile-back-desktop"
             style="color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1.5px solid #000; padding: 0.5rem 1.2rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; background: white;">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
@@ -25,6 +26,18 @@
         </div>
     </div>
 
+    <!-- Cover Photo Section -->
+    <div class="profile-header-card" id="coverPhotoCard" style="padding: 0; margin-bottom: 1.5rem; overflow: hidden;">
+        <div style="position: relative; height: 120px; background: {% if user.cover_photo %}url({{ url_for('uploaded_file', filename=user.cover_photo) }}) center/cover{% else %}linear-gradient(135deg, #6366f1, #8b5cf6){% endif %};">
+            <label for="coverPhotoUpdate" style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.9); padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <i class="fas fa-camera"></i> Change Cover
+            </label>
+            <form id="coverPhotoForm" action="{{ url_for('update_cover_photo') }}" method="POST" enctype="multipart/form-data" style="display:none;">
+                <input type="file" id="coverPhotoUpdate" name="cover_photo" accept="image/*" onchange="document.getElementById('coverPhotoForm').submit()">
+            </form>
+        </div>
+    </div>
+
     <!-- Profile Header -->
     <div class="profile-header-card" id="profileHeaderCard" style="display: flex; align-items: center; gap: 1.5rem; padding: 2rem; background: white; border-radius: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 2rem; position: relative;">
         <div class="profile-avatar" style="width: 100px; height: 100px; border-radius: 50%; overflow: hidden; position: relative; padding: 0; flex-shrink: 0; border: 3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
@@ -32,10 +45,10 @@
                 style="cursor: pointer; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; margin: 0; background: var(--primary); color: white; font-size: 2rem; font-weight: 700;">
                 {% if session.get('profile_pic') %}
                 <img src="{{ url_for('uploaded_file', filename=session.get('profile_pic')) }}"
-                    style="width: 100%; height: 100%; object-fit: cover;">
-                {% else %}
-                <span>{{ user.username[0]|upper }}</span>
+                    style="width: 100%; height: 100%; object-fit: cover;"
+                    onerror="this.style.display='none';this.parentElement.querySelector('span').style.display='block';">
                 {% endif %}
+                <span style="{% if session.get('profile_pic') %}display: none;{% endif %}">{{ user.username[0]|upper }}</span>
                 <div
                     style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); padding: 4px 0; text-align: center; color: white;">
                     <i class="fas fa-camera" style="font-size: 0.9rem;"></i>
@@ -53,8 +66,8 @@
                 <i class="fas fa-envelope" style="color: var(--primary); margin-right: 0.3rem;"></i>{{ user.email }}
             </p>
             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                <span style="font-size: 0.82rem; color: #64748b; background: #f8fafc; padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #e2e8f0;">
-                    <i class="fas fa-id-badge" style="margin-right: 0.3rem;"></i>Member ID: {{ user.mck_id or user.id }}
+                <span class="member-id-badge" style="font-size: 0.85rem; color: var(--primary); background: #f0f9ff; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--primary); font-weight: 700;">
+                    <i class="fas fa-id-badge" style="margin-right: 0.4rem;"></i>MCK-{{ user.mck_id or user.id }}
                 </span>
                 <a href="{{ url_for('public_profile', mck_id=user.mck_id or 'MCK-' + user.id) }}"
                     style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.8rem; background: #f1f5f9; color: var(--primary); border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid #e2e8f0; transition: background 0.2s;"
@@ -444,6 +457,13 @@
         .profile-header-card {
             flex-wrap: wrap;
         }
+        #coverPhotoCard {
+            display: none !important;
+        }
+        .member-id-badge {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.7rem !important;
+        }
     }
 </style>
 
@@ -459,6 +479,7 @@
         document.getElementById('editHeader').style.display = 'flex';
         document.getElementById('mainProfileHeader').style.display = 'none';
         document.getElementById('profileHeaderCard').style.display = 'none';
+        document.getElementById('coverPhotoCard').style.display = 'none';
 
         let bottomSave = document.getElementById('bottomSaveBtn');
         if (bottomSave) bottomSave.style.display = 'none';
@@ -476,6 +497,7 @@
         document.getElementById('editHeader').style.display = 'none';
         document.getElementById('mainProfileHeader').style.display = 'flex';
         document.getElementById('profileHeaderCard').style.display = 'flex';
+        document.getElementById('coverPhotoCard').style.display = 'block';
 
         if (window.innerWidth > 768) {
             let leftCol = document.querySelector('.profile-grid > div:first-child');

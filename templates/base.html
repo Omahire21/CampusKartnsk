@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CampusKart – College Marketplace</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=12.5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=13.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
     <!-- Instant Navigation & Transitions -->
@@ -149,7 +149,7 @@
             <a href="{{ url_for('leaderboard') }}" class="nav-icon-link" title="Leaderboard"><i
                     class="fas fa-ranking-star"></i> Leaderboard</a>
             <a href="{{ url_for('profile') }}"
-                class="nav-icon-link {% if request.path.startswith('/profile') %}nav-active{% endif %}"
+                class="nav-icon-link"
                 title="Profile"><i class="fas fa-user-circle"></i> Profile</a>
             <a href="{{ url_for('add_product') }}" class="nav-btn-sell"><i class="fas fa-plus"></i> Sell Item</a>
             <a href="{{ url_for('logout') }}" class="nav-btn-logout" title="Logout"><i
@@ -304,14 +304,15 @@
                 transform: translateX(-50%);
                 background: #333;
                 color: white;
-                padding: 1rem 2rem;
-                border-radius: 50px;
+                padding: 0.6rem 1.5rem;
+                border-radius: 8px;
                 font-weight: 600;
                 z-index: 10000;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                font-family: 'Outfit', sans-serif;
+                font-family: 'Plus Jakarta Sans', sans-serif;
                 pointer-events: none;
-                animation: popUp 0.4s ease forwards, fadeAway 0.4s ease 2.5s forwards;
+                animation: popUp 0.3s ease forwards, fadeAway 0.3s ease 2.5s forwards;
+                white-space: nowrap;
             `;
             toast.innerText = "Social Media handles are coming soon! 🚀";
             document.body.appendChild(toast);
@@ -522,6 +523,26 @@
             });
         }
         
+        // Set active nav item based on current path
+        window.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-icon-link');
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && (currentPath === href || 
+                    (href.includes('/profile') && currentPath.startsWith('/profile')) ||
+                    (href.includes('/add-product') && currentPath === '/add-product') ||
+                    (href === '/' && currentPath === '/') ||
+                    (href === '/products' && currentPath.startsWith('/products')) ||
+                    (href === '/favorites' && currentPath === '/favorites') ||
+                    (href === '/my-chats' && currentPath === '/my-chats') ||
+                    (href === '/my-items' && currentPath === '/my-items') ||
+                    (href === '/leaderboard' && currentPath === '/leaderboard'))) {
+                    link.classList.add('nav-active');
+                }
+            });
+        });
+
         // Prevent scroll jump on link clicks
         document.addEventListener('click', function(e) {
             const chipLink = e.target.closest('.college-chip, .category-pill');

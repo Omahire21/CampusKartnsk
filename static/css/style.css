@@ -1952,13 +1952,18 @@ nav {
         font-size: 0.72rem;
     }
 
-    /* Hide internal back button on mobile */
-    .ap-back-btn {
-        display: none !important;
-    }
+/* Hide internal back button on mobile */
+     .ap-back-btn {
+         display: none !important;
+     }
 
-    /* --- CONTAINER SECTIONS --- */
-    .container {
+     /* Profile mobile styles */
+     #coverPhotoCard {
+         display: none !important;
+     }
+
+     /* --- CONTAINER SECTIONS --- */
+     .container {
         padding: 1.2rem 0.8rem 2.5rem;
     }
 

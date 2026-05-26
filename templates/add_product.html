@@ -57,6 +57,49 @@
         text-align: center;
     }
 
+    .ap-step1-title {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+    }
+
+    .ap-step1-subtitle {
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .ap-step1-title {
+            font-size: 1.5rem;
+        }
+
+        .ap-step1-subtitle {
+            font-size: 0.9rem;
+            padding: 0 1rem;
+        }
+
+        .ap-card-grid {
+            gap: 1rem;
+        }
+
+        .ap-category-card {
+            width: 100%;
+            max-width: 320px;
+            padding: 2rem 1rem;
+        }
+
+        .ap-header {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .ap-header h2 {
+            position: static;
+            transform: none;
+            font-size: 1.2rem;
+        }
+    }
+
     .ap-card-grid {
         display: flex;
         justify-content: center;
